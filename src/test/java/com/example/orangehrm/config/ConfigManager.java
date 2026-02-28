@@ -76,7 +76,7 @@ public class ConfigManager {
 
     // Configuration getters
     public static String getAppUrl() {
-        return getProperty("app.url", "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
+        return getProperty("app.url", "https://opensource-demo.orangehrmlive.com/");
     }
 
     public static String getUsername() {
