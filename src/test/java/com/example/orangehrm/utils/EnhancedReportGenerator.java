@@ -54,6 +54,7 @@ public class EnhancedReportGenerator {
         long durationMs;
         String errorMessage;
         String screenshotPath;
+        String screenshotBase64;  // Store base64 encoded screenshot
         
         public TestStep(String keyword, String name) {
             this.keyword = keyword;
@@ -177,7 +178,15 @@ public class EnhancedReportGenerator {
                                 // Check for embedded screenshots
                                 JsonNode embeddings = step.get("embeddings");
                                 if (embeddings != null && embeddings.isArray() && embeddings.size() > 0) {
-                                    testStep.screenshotPath = "screenshot_" + scenario.steps.size();
+                                    for (JsonNode embedding : embeddings) {
+                                        if (embedding.has("mime_type") && embedding.get("mime_type").asText().contains("image")) {
+                                            if (embedding.has("data")) {
+                                                testStep.screenshotBase64 = embedding.get("data").asText();
+                                                testStep.screenshotPath = "screenshot_" + scenario.steps.size();
+                                                break;  // Take first image
+                                            }
+                                        }
+                                    }
                                 }
                                 
                                 scenario.steps.add(testStep);
@@ -313,6 +322,8 @@ public class EnhancedReportGenerator {
                "        .step-keyword { font-weight: 600; color: #667eea; }\n" +
                "        .step-duration { font-size: 12px; color: #94a3b8; }\n" +
                "        .error-message { background: #fee2e2; border-left: 4px solid #ef4444; padding: 15px; border-radius: 8px; margin-top: 10px; font-family: 'Courier New', monospace; font-size: 13px; color: #991b1b; white-space: pre-wrap; }\n" +
+               "        .step-screenshot { margin-top: 12px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; }\n" +
+               "        .screenshot-img { max-width: 100%; height: auto; border-radius: 8px; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }\n" +
                "        .footer { text-align: center; padding: 30px; color: white; font-size: 14px; }\n" +
                "        .badge { display: inline-block; padding: 5px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }\n" +
                "        .badge-passed { background: #d1fae5; color: #065f46; }\n" +
@@ -525,6 +536,13 @@ public class EnhancedReportGenerator {
                 
                 if (step.errorMessage != null && !step.errorMessage.isEmpty()) {
                     details.append("                                <div class=\"error-message\">").append(escapeHtml(step.errorMessage)).append("</div>\n");
+                }
+                
+                // Display screenshot if available
+                if (step.screenshotBase64 != null && !step.screenshotBase64.isEmpty()) {
+                    details.append("                                <div class=\"step-screenshot\">\n");
+                    details.append("                                    <img src=\"data:image/png;base64,").append(step.screenshotBase64).append("\" alt=\"Step Screenshot\" class=\"screenshot-img\">\n");
+                    details.append("                                </div>\n");
                 }
                 
                 details.append("                            </div>\n");
