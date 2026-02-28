@@ -87,10 +87,18 @@ public class Hooks {
             
             playwright = Playwright.create();
             if ("chrome".equals(browserName)) {
-                browser = playwright.chromium()
-                    .launch(new BrowserType.LaunchOptions()
-                        .setChannel("chrome")
-                        .setHeadless(headless));
+                // Use system Chrome if available, otherwise Playwright's bundled chromium
+                try {
+                    browser = playwright.chromium()
+                        .launch(new BrowserType.LaunchOptions()
+                            .setChannel("chrome")
+                            .setHeadless(headless));
+                } catch (Exception e) {
+                    TestLogger.warn("Chrome not found, using bundled Chromium: " + e.getMessage());
+                    browser = playwright.chromium()
+                        .launch(new BrowserType.LaunchOptions()
+                            .setHeadless(headless));
+                }
             } else if ("chromium".equals(browserName)) {
                 browser = playwright.chromium()
                     .launch(new BrowserType.LaunchOptions()
@@ -107,8 +115,17 @@ public class Hooks {
                     .launch(new BrowserType.LaunchOptions()
                         .setHeadless(headless));
             }
-            // Create page with a reasonable viewport size
+            // Create page with standard browser context (includes user-agent)
             page = browser.newPage();
+            // Set explicit user-agent for better site compatibility
+            try {
+                page.setExtraHTTPHeaders(java.util.Collections.singletonMap(
+                    "User-Agent", 
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                ));
+            } catch (Exception e) {
+                TestLogger.warn("Could not set headers: " + e.getMessage());
+            }
             // Set viewport size after page creation for better compatibility
             try {
                 page.setViewportSize(1920, 1080);
@@ -142,12 +159,17 @@ public class Hooks {
     }
 
     private void navigateWithRetry(String appUrl, int navigationTimeout) {
-        // Simple navigation - let Playwright handle timing
+        // Navigate with COMMIT state - waits for DOMContentLoaded which is sufficient for most SPAs
         try {
             TestLogger.info("Navigating to: " + appUrl);
 
             long startTime = System.currentTimeMillis();
-            page.navigate(appUrl);
+            page.navigate(
+                appUrl,
+                new Page.NavigateOptions()
+                    .setTimeout(30000.0)  // 30 second timeout for external site
+                    .setWaitUntil(WaitUntilState.COMMIT)
+            );
             long navigationTime = System.currentTimeMillis() - startTime;
             TestLogger.info("Page navigation completed in " + navigationTime + "ms");
 

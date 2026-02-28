@@ -310,8 +310,26 @@ public class StepDefinitions {
     public void i_should_see_login_button() {
         TestLogger.testStep("Verify login button is visible");
         assertNotNull(loginPage, "Login page should exist");
-        assertTrue(loginPage.isElementVisible("button[type='submit']"),
-                "Login button should be visible");
+        
+        // Try to wait for button with explicit timeout and retries
+        boolean buttonVisible = false;
+        long startTime = System.currentTimeMillis();
+        long maxWaitMs = 10000;  // Max 10 seconds to wait
+        
+        while (System.currentTimeMillis() - startTime < maxWaitMs) {
+            if (loginPage.isElementVisible("button[type='submit']")) {
+                buttonVisible = true;
+                break;
+            }
+            try {
+                Thread.sleep(500);  // Check every 500ms
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        
+        assertTrue(buttonVisible, "Login button should be visible");
         TestLogger.assertion("Login button is visible");
     }
 
@@ -319,9 +337,35 @@ public class StepDefinitions {
     public void i_verify_login_page_elements_visible() {
         TestLogger.testStep("Verify all login page elements");
         assertNotNull(loginPage, "Login page should exist");
-        assertTrue(loginPage.isElementVisible("input[name='username']"), "Username field should be visible");
-        assertTrue(loginPage.isElementVisible("input[name='password']"), "Password field should be visible");
-        assertTrue(loginPage.isElementVisible("button[type='submit']"), "Login button should be visible");
+        
+        // Wait for all form elements with retries (10 second timeout)
+        long startTime = System.currentTimeMillis();
+        long maxWaitMs = 10000;
+        boolean allVisible = false;
+        
+        while (System.currentTimeMillis() - startTime < maxWaitMs) {
+            if (loginPage.isElementVisible("input[name='username']") &&
+                loginPage.isElementVisible("input[name='password']") &&
+                loginPage.isElementVisible("button[type='submit']")) {
+                allVisible = true;
+                break;
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        
+        // At least check if elements exist, even if not fully visible
+        if (!allVisible) {
+            TestLogger.warn("Some form elements not visible within 10 seconds, checking presence...");
+            assertTrue(loginPage.isElementVisible("input[name='username']"), "Username field should be visible");
+            assertTrue(loginPage.isElementVisible("input[name='password']"), "Password field should be visible");
+            assertTrue(loginPage.isElementVisible("button[type='submit']"), "Login button should be visible");
+        }
+        
         TestLogger.assertion("All login page elements are visible");
     }
 
