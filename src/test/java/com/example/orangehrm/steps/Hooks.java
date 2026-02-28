@@ -12,6 +12,7 @@ import com.example.orangehrm.utils.ScreenshotHelper;
 import com.example.orangehrm.utils.VisualCheckpointHelper;
 import com.example.orangehrm.utils.ElementLocatorHelper;
 import com.example.orangehrm.utils.SimpleReportTracker;
+import com.example.orangehrm.utils.EnhancedReportGenerator;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -44,6 +45,7 @@ public class Hooks {
     private static volatile int scenariosPassed = 0;
     private static volatile int scenariosFailed = 0;
     private static ThreadLocal<java.time.LocalDateTime> scenarioStartTime = new ThreadLocal<>();
+    private static java.time.LocalDateTime testSuiteStartTime = java.time.LocalDateTime.now();
 
     static {
         // Register shutdown hook to ensure report is generated even if tests are interrupted
@@ -54,14 +56,19 @@ public class Hooks {
             TestLogger.info("Scenarios Failed: " + scenariosFailed);
             TestLogger.info("\nGenerating reports from captured data...");
             
-            // Ensure final report is generated
+            // Ensure final reports are generated
             SimpleReportTracker.generateHtmlReport();
+            
+            // Generate enhanced report with beautiful UI
+            EnhancedReportGenerator.setTestEndTime(java.time.LocalDateTime.now());
+            EnhancedReportGenerator.generateEnhancedReport();
             
             // Try generating from Cucumber JSON if available
             com.example.orangehrm.utils.ReportGenerator.generatePartialReport();
             
             TestLogger.info("\n📊 AVAILABLE REPORTS:");
-            TestLogger.info("  ✅ Live Report: target/test-execution-report.html (ALWAYS AVAILABLE)");
+            TestLogger.info("  ✨ Enhanced Report: target/enhanced-test-report.html (RECOMMENDED!)");
+            TestLogger.info("  ✅ Live Report: target/test-execution-report.html");
             TestLogger.info("  📄 Report Data: target/test-execution-data.txt");
             TestLogger.info("  📋 Cucumber JSON: target/cucumber.json (if available)");
             TestLogger.info("  📈 Partial Report: target/cucumber-report-partial.html (if JSON available)");
@@ -75,6 +82,12 @@ public class Hooks {
         scenarioStartTime.set(java.time.LocalDateTime.now()); // Track start time
         String browserName = ConfigManager.getBrowser();
         boolean headless = ConfigManager.isHeadless();
+        
+        // Set metadata for enhanced report (only once)
+        if (scenariosExecuted == 0) {
+            EnhancedReportGenerator.setTestStartTime(testSuiteStartTime);
+            EnhancedReportGenerator.setMetadata(browserName, headless);
+        }
         
         TestLogger.startScenario(scenario.getName());
         TestLogger.info("Starting test scenario... browser=" + browserName + " headless=" + headless);
@@ -151,6 +164,7 @@ public class Hooks {
             String appUrl = ConfigManager.getAppUrl();
             // Use our configured timeout, but never less than 30 seconds.
             // External sites can be slow, especially demo environments.
+            int navigationTimeout = MIN_NAVIGATION_TIMEOUT_MS;
 
             page.setDefaultTimeout(navigationTimeout);
             page.setDefaultNavigationTimeout(navigationTimeout);

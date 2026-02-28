@@ -249,20 +249,34 @@ After each test run, you'll find:
 
 | File/Directory | Description |
 |----------------|-------------|
-| `target/cucumber-report.html` | Main HTML report with screenshots |
-| `target/test-execution-report.html` | Alternative detailed report |
+| `target/enhanced-test-report.html` | **⭐ NEW!** Beautiful modern report with charts, timeline, and detailed analytics |
+| `target/cucumber-report.html` | Standard Cucumber HTML report |
+| `target/test-execution-report.html` | Live report (auto-refreshes during test run) |
 | `target/cucumber.json` | JSON report for CI/CD integration |
 | `target/screenshots/` | Screenshots captured during tests |
 | `target/logs/test-execution.log` | Detailed execution logs |
 
+### 🌟 Enhanced Report Features
+
+The new enhanced report includes:
+- 📊 **Interactive Charts** - Visual analytics with Chart.js
+- 🎨 **Modern UI** - Clean, professional design with gradient cards
+- ⏱️ **Execution Timeline** - See your tests run in sequence
+- 📈 **Detailed Metrics** - Pass rates, duration stats, scenario breakdowns
+- 🔍 **Expandable Details** - Click any scenario to see step-by-step execution
+- 🎯 **Playwright-Specific Info** - Browser type, headless mode, and more
+- 📱 **Responsive Design** - Looks great on any device
+
 ### View Reports
 
 ```bash
-# Windows
-start target/cucumber-report.html
+# Windows - Open the enhanced report
+start target/enhanced-test-report.html
 
 # Mac/Linux
-open target/cucumber-report.html
+open target/enhanced-test-report.html
+
+# Or just double-click the HTML file in your file explorer
 ```
 
 ## Troubleshooting
