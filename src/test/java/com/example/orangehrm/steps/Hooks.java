@@ -168,33 +168,20 @@ public class Hooks {
     }
 
     private void navigateWithRetry(String appUrl, int navigationTimeout) {
-        // Navigate with optimized settings - LOAD waits for page load event (fast for SPAs)
+        // Navigate with stable settings - LOAD event ensures page is ready
         try {
             TestLogger.info("Navigating to: " + appUrl);
-
-            // Block non-essential resources to prevent slow navigation
-            page.route("**", route -> {
-                String type = route.request().resourceType();
-                // Only allow critical resources
-                if ("document".equals(type) || "script".equals(type) || "xhr".equals(type) || "fetch".equals(type)) {
-                    route.resume();
-                } else {
-                    // Block images, fonts, stylesheets, media to speed up navigation
-                    route.abort();
-                }
-            });
 
             long startTime = System.currentTimeMillis();
             page.navigate(
                 appUrl,
                 new Page.NavigateOptions()
-                    .setTimeout(10000.0)  // 10 second timeout - ultra-fast
-                    .setWaitUntil(WaitUntilState.DOMCONTENTLOADED)  // Wait only for DOM, skip resources
+                    .setTimeout(30000.0)  // 30 second timeout for external demo site
+                    .setWaitUntil(WaitUntilState.LOAD)  // Wait for complete page load
             );
-            page.unroute("**");  // Re-enable all resources after initial load for normal interaction
             
             long navigationTime = System.currentTimeMillis() - startTime;
-            TestLogger.info("Page navigation completed in " + navigationTime + "ms (using fast DOMCONTENTLOADED + resource blocking)");
+            TestLogger.info("Page navigation completed in " + navigationTime + "ms");
 
             TestLogger.info("Navigation successful, login page ready for interaction");
             return;
