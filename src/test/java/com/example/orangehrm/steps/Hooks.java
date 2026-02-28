@@ -240,11 +240,7 @@ public class Hooks {
             status = "PASSED";
         }
         
-        // Record to real-time tracker (writes immediately to disk)
-        SimpleReportTracker.recordScenario(scenario.getName(), status, 
-            startTime != null ? startTime : endTime, endTime, durationMs);
-        
-        TestLogger.info("Current Status: " + SimpleReportTracker.getStats());
+        TestLogger.info("Scenario " + status + " - Duration: " + durationMs + "ms");
         
         try {
             // Clear browser cache, cookies, and storage after each scenario

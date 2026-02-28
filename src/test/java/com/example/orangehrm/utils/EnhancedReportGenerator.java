@@ -21,7 +21,6 @@ public class EnhancedReportGenerator {
     private static final String JSON_REPORT_PATH = "target/cucumber.json";
     private static final String ENHANCED_REPORT_PATH = "target/enhanced-test-report.html";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
     
     private static List<TestScenario> testScenarios = new ArrayList<>();
     private static LocalDateTime testStartTime = LocalDateTime.now();
