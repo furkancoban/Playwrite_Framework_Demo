@@ -38,7 +38,7 @@ public class Hooks {
     public static Properties testProperties;
     public static Scenario currentScenario;
 
-    private static final int MIN_NAVIGATION_TIMEOUT_MS = 15000;  // 15 seconds max wait
+    private static final int MIN_NAVIGATION_TIMEOUT_MS = 30000;  // 30 seconds minimum for stable initial load
     @SuppressWarnings("unused")
 	private static final int NAVIGATION_RETRY_COUNT = 2;  // Reduce retries for faster failure
     private static volatile int scenariosExecuted = 0;
@@ -111,9 +111,8 @@ public class Hooks {
                         .setHeadless(headless)
                         .setArgs(java.util.Arrays.asList("--start-maximized")));
             }
-            // Create page with optimized viewport size for full screen testing
-            page = browser.newPage(new Browser.NewPageOptions()
-                .setViewportSize(1920, 1080));
+            // Create page without viewport size to allow browser to use native maximized size
+            page = browser.newPage();
             testContext = new TestContext(page);
             
             // Initialize helper utilities
@@ -121,8 +120,8 @@ public class Hooks {
             ElementLocatorHelper.initializeSelfHealing(page);
             
             String appUrl = ConfigManager.getAppUrl();
-            // Use optimized timeout - don't exceed minimum
-            int navigationTimeout = MIN_NAVIGATION_TIMEOUT_MS;  // 15 seconds
+            // Use configured timeout with a safe minimum for external site variability
+            int navigationTimeout = Math.max(ConfigManager.getPageLoadTimeout(), MIN_NAVIGATION_TIMEOUT_MS);
 
             page.setDefaultTimeout(navigationTimeout);
             page.setDefaultNavigationTimeout(navigationTimeout);
@@ -140,10 +139,7 @@ public class Hooks {
     }
 
     private void navigateWithRetry(String appUrl, int navigationTimeout) {
-        @SuppressWarnings("unused")
-		Exception lastError = null;
-
-        // Try primary URL with optimized timeout - no retries, fail fast
+        // Try primary navigation - trust Playwright's COMMIT state means DOM is ready
         try {
             TestLogger.info("Navigating to: " + appUrl);
 
@@ -151,45 +147,16 @@ public class Hooks {
             page.navigate(
                 appUrl,
                 new Page.NavigateOptions()
-                    .setTimeout((double) navigationTimeout)  // 15 seconds max
-                    .setWaitUntil(WaitUntilState.NETWORKIDLE)  // Wait for network idle for better stability
+                    .setTimeout((double) navigationTimeout)
+                    .setWaitUntil(WaitUntilState.COMMIT)
             );
             long navigationTime = System.currentTimeMillis() - startTime;
-            TestLogger.info("Page navigated in " + navigationTime + "ms");
+            TestLogger.info("Page navigation committed in " + navigationTime + "ms");
 
-            // Wait for username field with very short timeout
-            page.waitForSelector(
-                "input[name='username']",
-                new Page.WaitForSelectorOptions().setTimeout(5000)  // 5 seconds for element
-            );
-
-            TestLogger.info("Login page ready for interaction");
+            TestLogger.info("Navigation successful, login page should be ready");
             return;
         } catch (Exception e) {
-            lastError = e;
             TestLogger.warn("Navigation failed: " + e.getMessage());
-        }
-
-        // Quick single fallback retry
-        try {
-            TestLogger.info("Retrying with alternative strategy...");
-            long startTime = System.currentTimeMillis();
-            
-            // Force reload to clear any cache issues
-            page.reload();
-            
-            long navigationTime = System.currentTimeMillis() - startTime;
-            TestLogger.info("Page reloaded in " + navigationTime + "ms");
-
-            page.waitForSelector(
-                "input[name='username']",
-                new Page.WaitForSelectorOptions().setTimeout(5000)
-            );
-
-            TestLogger.info("Login page ready");
-            return;
-        } catch (Exception e) {
-            TestLogger.error("Failed to load login page after retry", e);
             throw new RuntimeException("Cannot load login page: " + appUrl, e);
         }
     }

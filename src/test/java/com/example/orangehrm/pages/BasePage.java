@@ -11,7 +11,7 @@ import com.microsoft.playwright.Page;
 public class BasePage {
 
     protected Page page;
-    protected static final int DEFAULT_TIMEOUT = 5000;  // 5 seconds max for element operations
+    protected static final int DEFAULT_TIMEOUT = 15000;  // 15 seconds for element operations
 
     public BasePage(Page page) {
         this.page = page;

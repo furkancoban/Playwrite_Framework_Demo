@@ -92,7 +92,7 @@ public class ConfigManager {
     }
 
     public static boolean isHeadless() {
-        return Boolean.parseBoolean(System.getProperty("test.headless", "true"));
+        return Boolean.parseBoolean(System.getProperty("test.headless", "false"));
     }
 
     public static int getPageLoadTimeout() {
