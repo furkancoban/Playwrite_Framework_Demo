@@ -233,6 +233,25 @@ public class Hooks {
         TestLogger.info("Current Status: " + SimpleReportTracker.getStats());
         
         try {
+            // Clear browser cache, cookies, and storage after each scenario
+            if (page != null) {
+                try {
+                    // Clear cookies
+                    page.context().clearCookies();
+                    TestLogger.info("Cookies cleared after scenario");
+
+                    // Clear local storage and session storage
+                    page.evaluate("() => { localStorage.clear(); sessionStorage.clear(); }");
+                    TestLogger.info("Local storage and session storage cleared");
+
+                    // Clear IndexedDB
+                    page.evaluate("() => { indexedDB.databases().then(dbs => { dbs.forEach(db => { indexedDB.deleteDatabase(db.name); }); }); }");
+                    TestLogger.debug("IndexedDB cleared");
+                } catch (Exception e) {
+                    TestLogger.warn("Could not clear all browser storage: " + e.getMessage());
+                }
+            }
+
             // Close visual checkpoint tracking
             if (VisualCheckpointHelper.isVisualTestingActive()) {
                 VisualCheckpointHelper.closeVisualTesting();
