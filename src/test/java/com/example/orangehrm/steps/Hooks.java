@@ -93,11 +93,13 @@ public class Hooks {
                     browser = playwright.chromium()
                         .launch(new BrowserType.LaunchOptions()
                             .setChannel("chrome")
+                            .setArgs(java.util.Arrays.asList("--start-maximized"))
                             .setHeadless(headless));
                 } catch (Exception e) {
                     TestLogger.warn("Chrome not found, using bundled Chromium: " + e.getMessage());
                     browser = playwright.chromium()
                         .launch(new BrowserType.LaunchOptions()
+                            .setArgs(java.util.Arrays.asList("--start-maximized"))
                             .setHeadless(headless));
                 }
             } else if ("chromium".equals(browserName)) {
@@ -137,12 +139,14 @@ public class Hooks {
             
             var context = browser.newContext(contextOptions);
             page = context.newPage();
-            // Set viewport size after page creation - works better this way
-            try {
-                page.setViewportSize(1920, 1080);
-            } catch (Exception e) {
-                TestLogger.warn("Could not set viewport size: " + e.getMessage());
-                // Not a big deal, continue anyway
+            // Maximize window if not headless (Chrome --start-maximized flag handles most of it)
+            if (!headless) {
+                try {
+                    page.evaluate("window.moveTo(0, 0); window.resizeTo(screen.width, screen.height);");
+                    TestLogger.info("Browser window maximized");
+                } catch (Exception e) {
+                    TestLogger.debug("Could not maximize window: " + e.getMessage());
+                }
             }
             testContext = new TestContext(page);
             

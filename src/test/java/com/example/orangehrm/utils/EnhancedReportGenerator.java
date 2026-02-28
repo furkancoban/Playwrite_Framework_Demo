@@ -335,7 +335,7 @@ public class EnhancedReportGenerator {
         String statusText = passRate == 100 ? "All Tests Passed" : passRate >= 80 ? "Mostly Passed" : "Tests Failed";
         
         return "        <div class=\"header\">\n" +
-               "            <h1><span class=\"icon\">🎭</span> Playwright Test Execution Report</h1>\n" +
+               "            <h1><span class=\"icon\">🎭</span> Playwright ORANGE HRM Test Execution Report</h1>\n" +
                "            <p style=\"font-size: 18px; color: #64748b; margin-top: 10px;\">" + statusEmoji + " " + statusText + " - " + passed + "/" + total + " scenarios passed</p>\n" +
                "            <div class=\"header-meta\">\n" +
                "                <div class=\"header-meta-item\"><i class=\"fas fa-calendar\"></i> <span>" + testStartTime.format(DATE_FORMATTER) + "</span></div>\n" +
