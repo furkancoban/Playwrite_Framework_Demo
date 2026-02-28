@@ -148,8 +148,19 @@
                         </goals>
                         <configuration>
                             <target>
+                                <!-- Clean report files -->
                                 <delete file="${project.build.directory}/cucumber-report.html" failonerror="false" quiet="true"/>
+                                <delete file="${project.build.directory}/cucumber-report-partial.html" failonerror="false" quiet="true"/>
                                 <delete file="${project.build.directory}/cucumber.json" failonerror="false" quiet="true"/>
+                                <delete file="${project.build.directory}/test-execution-report.html" failonerror="false" quiet="true"/>
+                                <delete file="${project.build.directory}/test-execution-data.txt" failonerror="false" quiet="true"/>
+                                
+                                <!-- Clean generated directories -->
+                                <delete dir="${project.build.directory}/screenshots" failonerror="false" quiet="true"/>
+                                <delete dir="${project.build.directory}/logs" failonerror="false" quiet="true"/>
+                                <delete dir="${project.build.directory}/heal-logs" failonerror="false" quiet="true"/>
+                                <delete dir="${project.build.directory}/visual-checkpoints" failonerror="false" quiet="true"/>
+                                <delete dir="${project.build.directory}/surefire-reports" failonerror="false" quiet="true"/>
                             </target>
                         </configuration>
                     </execution>
