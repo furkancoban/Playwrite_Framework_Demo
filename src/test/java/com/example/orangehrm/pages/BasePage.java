@@ -1,8 +1,8 @@
 package com.example.orangehrm.pages;
 
 import com.example.orangehrm.utils.TestLogger;
-import com.example.orangehrm.utils.AIElementLocator;
-import com.example.orangehrm.utils.AIVisualTestingHelper;
+import com.example.orangehrm.utils.ElementLocatorHelper;
+import com.example.orangehrm.utils.VisualCheckpointHelper;
 import com.example.orangehrm.config.ConfigManager;
 import com.microsoft.playwright.Page;
 
@@ -19,7 +19,7 @@ public class BasePage {
 
     /**
      * Click an element with proper wait and error handling.
-     * Removed excessive AI self-healing and visual checkpoints for better performance.
+     * Uses optimized timeout configuration for better performance.
      */
     @SuppressWarnings("unused")
     public void clickElement(String selector) {

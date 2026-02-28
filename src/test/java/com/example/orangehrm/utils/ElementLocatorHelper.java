@@ -5,54 +5,51 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * AI-powered self-healing locators for element discovery.
+ * Smart element locator with fallback strategies for robust test execution.
  * 
- * When element selectors break due to UI changes, this utility learns
- * from past successful locations and automatically finds similar elements
- * even if selectors change. This dramatically reduces test maintenance.
+ * When element selectors fail due to UI changes, this utility attempts
+ * alternative selector strategies to find elements, reducing test brittleness.
+ * Successful selectors are cached for improved performance.
  * 
  * How it works:
- * 1. Test executes with a selector (e.g., "input[name='username']")
- * 2. If selector fails, AI tries alternative selectors
- * 3. On success, learns and caches the working selector
- * 4. Next run, tries learned selector first
- * 5. Logs all healing actions for debugging
- * 
- * Can be extended with Healenium for enterprise-grade self-healing:
- * Add dependency: com.epam.healenium:healenium-playwright:x.x.x
+ * 1. Test executes with a primary selector (e.g., "input[name='username']")
+ * 2. If selector fails, tries alternative strategies (ID, text, position)
+ * 3. On success, caches the working selector for future use
+ * 4. Next execution prioritizes cached selectors
+ * 5. Logs all fallback attempts for debugging
  * 
  * Benefits:
- * - Reduces flaky tests from UI changes
- * - Auto-learns Element location patterns
- * - Reduces manual selector maintenance
- * - Detailed logging of all healing actions
+ * - Reduces flaky tests from minor UI changes
+ * - Intelligent selector caching
+ * - Reduced maintenance overhead
+ * - Detailed logging of fallback attempts
  */
-public class AIElementLocator {
+public class ElementLocatorHelper {
 
     private static Map<String, String> selectorCache = new HashMap<>();
     private static Map<String, Integer> healingAttempts = new HashMap<>();
     private static boolean healingEnabled = true;
     
     /**
-     * Initialize self-healing driver
+     * Initialize element locator helper
      * Should be called during test setup
      */
     public static void initializeSelfHealing(Page page) {
         try {
-            // Create checkpoint directory for healing logs
+            // Create checkpoint directory for fallback logs
             java.io.File checkpointDir = new java.io.File("target/heal-logs");
             if (!checkpointDir.exists()) {
                 checkpointDir.mkdirs();
             }
             
-            TestLogger.info("Self-healing AI locator initialized");
+            TestLogger.info("Element locator helper initialized");
         } catch (Exception e) {
-            TestLogger.warn("Self-healing initialization issue", e);
+            TestLogger.warn("Initialization issue", e);
         }
     }
     
     /**
-     * Find element using AI self-healing if primary selector fails
+     * Find element using fallback strategies if primary selector fails
      * 
      * @param page Playwright page instance
      * @param primarySelector Primary CSS/XPath selector
@@ -83,7 +80,7 @@ public class AIElementLocator {
             try {
                 var locator = page.locator(cachedSelector);
                 if (locator.count() > 0 && locator.isVisible()) {
-                    TestLogger.info("AI healed selector for: " + elementDescription + 
+                    TestLogger.info("Located element for: " + elementDescription + 
                                    " (cached: " + cachedSelector + ")");
                     recordHealing(elementDescription);
                     return locator;
@@ -93,18 +90,18 @@ public class AIElementLocator {
             }
         }
         
-        // Attempt AI-based healing using alternative selectors
+        // Attempt fallback using alternative selectors
         return attemptAIHealing(page, primarySelector, elementDescription);
     }
     
     /**
-     * Smart element finding with AI learning
+     * Smart element finding with fallback strategies
      * Tries multiple approaches to locate an element
      */
     private static com.microsoft.playwright.Locator attemptAIHealing(
             Page page, String primarySelector, String elementDescription) {
         
-        TestLogger.testStep("AI attempting to heal selector for: " + elementDescription);
+        TestLogger.testStep("Attempting fallback strategies for: " + elementDescription);
         
         // Approach 1: Find by text if selector contains text pattern
         if (primarySelector.contains("has-text") || primarySelector.contains("text=")) {
@@ -113,14 +110,14 @@ public class AIElementLocator {
                 if (textPattern != null) {
                     var healedLocator = page.locator("text=" + textPattern);
                     if (healedLocator.count() > 0 && healedLocator.isVisible()) {
-                        TestLogger.success("AI healed with text pattern: " + textPattern);
+                        TestLogger.success("Located with text pattern: " + textPattern);
                         cacheSelector(elementDescription, "text=" + textPattern);
                         recordHealing(elementDescription);
                         return healedLocator;
                     }
                 }
             } catch (Exception e) {
-                TestLogger.debug("Text-based healing failed");
+                TestLogger.debug("Text-based fallback failed");
             }
         }
         
@@ -130,14 +127,14 @@ public class AIElementLocator {
             if (role != null) {
                 var healedLocator = page.locator("[role='" + role + "']");
                 if (healedLocator.count() > 0 && healedLocator.isVisible()) {
-                    TestLogger.success("AI healed using role: " + role);
+                    TestLogger.success("Located using role: " + role);
                     cacheSelector(elementDescription, "[role='" + role + "']");
                     recordHealing(elementDescription);
                     return healedLocator;
                 }
             }
         } catch (Exception e) {
-            TestLogger.debug("Role-based healing failed");
+            TestLogger.debug("Role-based fallback failed");
         }
         
         // Approach 3: Find by tag and partial attribute
@@ -146,18 +143,18 @@ public class AIElementLocator {
             if (attributePattern != null) {
                 var healedLocator = page.locator(attributePattern);
                 if (healedLocator.count() > 0 && healedLocator.isVisible()) {
-                    TestLogger.success("AI healed using attribute pattern: " + attributePattern);
+                    TestLogger.success("Located using attribute pattern: " + attributePattern);
                     cacheSelector(elementDescription, attributePattern);
                     recordHealing(elementDescription);
                     return healedLocator;
                 }
             }
         } catch (Exception e) {
-            TestLogger.debug("Attribute-based healing failed");
+            TestLogger.debug("Attribute-based fallback failed");
         }
         
-        // Approach 4: Fallback to original selector and hope
-        TestLogger.warn("AI could not heal selector: " + primarySelector + 
+        // Approach 4: Fallback to original selector
+        TestLogger.warn("Could not locate with fallback strategies: " + primarySelector + 
                        " for element: " + elementDescription + ". Using original selector.");
         recordHealing(elementDescription);
         return page.locator(primarySelector); // Will fail but with clear error
@@ -225,15 +222,15 @@ public class AIElementLocator {
     }
     
     /**
-     * Get selector healing statistics
+     * Get selector fallback statistics
      */
     public static void printHealingStats() {
         if (selectorCache.isEmpty() && healingAttempts.isEmpty()) {
-            TestLogger.info("No selectors were healed during this test run");
+            TestLogger.info("No fallback selectors were used during this test run");
         } else {
-            TestLogger.info("=== AI Selector Healing Statistics ===");
-            TestLogger.info("Total healed selectors: " + selectorCache.size());
-            TestLogger.info("Total healing attempts: " + healingAttempts.values().stream()
+            TestLogger.info("=== Element Locator Statistics ===");
+            TestLogger.info("Total fallback selectors: " + selectorCache.size());
+            TestLogger.info("Total fallback attempts: " + healingAttempts.values().stream()
                 .mapToInt(Integer::intValue).sum());
             
             selectorCache.forEach((key, value) -> 
@@ -244,7 +241,7 @@ public class AIElementLocator {
     }
     
     /**
-     * Clear healing cache
+     * Clear selector cache
      */
     public static void clearCache() {
         selectorCache.clear();
@@ -265,19 +262,19 @@ public class AIElementLocator {
     }
     
     /**
-     * Disable self-healing for specific tests if needed
+     * Disable fallback strategies for specific tests if needed
      */
     public static void disableHealing() {
         healingEnabled = false;
-        TestLogger.debug("Self-healing disabled");
+        TestLogger.debug("Fallback strategies disabled");
     }
     
     /**
-     * Re-enable self-healing
+     * Re-enable fallback strategies
      */
     public static void enableHealing() {
         healingEnabled = true;
-        TestLogger.debug("Self-healing enabled");
+        TestLogger.debug("Fallback strategies enabled");
     }
     
     /**

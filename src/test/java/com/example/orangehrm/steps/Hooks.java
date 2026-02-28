@@ -9,8 +9,8 @@ import com.example.orangehrm.config.ConfigManager;
 import com.example.orangehrm.context.TestContext;
 import com.example.orangehrm.utils.TestLogger;
 import com.example.orangehrm.utils.ScreenshotHelper;
-import com.example.orangehrm.utils.AIVisualTestingHelper;
-import com.example.orangehrm.utils.AIElementLocator;
+import com.example.orangehrm.utils.VisualCheckpointHelper;
+import com.example.orangehrm.utils.ElementLocatorHelper;
 import com.example.orangehrm.utils.SimpleReportTracker;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -116,9 +116,9 @@ public class Hooks {
                 .setViewportSize(1920, 1080));
             testContext = new TestContext(page);
             
-            // Initialize AI features
-            AIVisualTestingHelper.initializeVisualTesting(page, scenario.getName());
-            AIElementLocator.initializeSelfHealing(page);
+            // Initialize helper utilities
+            VisualCheckpointHelper.initializeVisualTesting(page, scenario.getName());
+            ElementLocatorHelper.initializeSelfHealing(page);
             
             String appUrl = ConfigManager.getAppUrl();
             // Use optimized timeout - don't exceed minimum
@@ -246,13 +246,13 @@ public class Hooks {
         TestLogger.info("Current Status: " + SimpleReportTracker.getStats());
         
         try {
-            // Close visual testing and get AI results
-            if (AIVisualTestingHelper.isVisualTestingActive()) {
-                AIVisualTestingHelper.closeVisualTesting();
+            // Close visual checkpoint tracking
+            if (VisualCheckpointHelper.isVisualTestingActive()) {
+                VisualCheckpointHelper.closeVisualTesting();
             }
             
-            // Print self-healing statistics
-            AIElementLocator.printHealingStats();
+            // Print element locator statistics
+            ElementLocatorHelper.printHealingStats();
             
             // Capture screenshot on test failure for troubleshooting
             if (scenario.isFailed() && page != null) {

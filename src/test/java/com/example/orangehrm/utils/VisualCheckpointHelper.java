@@ -7,25 +7,19 @@ import java.time.format.DateTimeFormatter;
 import java.io.File;
 
 /**
- * AI-powered visual testing helper for detecting visual regressions.
+ * Visual checkpoint helper for tracking UI state and detecting regressions.
  * 
- * This utility provides framework for visual AI testing integration.
- * It captures screenshots and provides hooks for AI comparison services
- * like Applitools Eyes, Percy, or AWS Lookout.
- * 
- * Setup for Applitools Eyes:
- * 1. Sign up at https://applitools.com
- * 2. Get your API key from account settings
- * 3. Set environment variable: APPLITOOLS_API_KEY=your-key
- * 4. Add to dependencies: com.applitools:eyes-playwright-java5:x.x.x
+ * This utility captures screenshots at key test points and provides
+ * a foundation for visual regression testing workflows.
+ * Can be extended to integrate with visual testing services.
  * 
  * Features:
- * - Automatic visual regression detection using AI/ML
- * - Cross-browser visual testing
- * - Detailed visual diffs in reports
- * - Screenshot capture at key test points
+ * - Screenshot capture at test checkpoints
+ * - Cross-browser visual testing support
+ * - Organized checkpoint storage
+ * - Detailed logging of capture events
  */
-public class AIVisualTestingHelper {
+public class VisualCheckpointHelper {
 
     private static boolean visualTestingEnabled = true;
     private static final DateTimeFormatter DATE_FORMATTER = 
@@ -33,8 +27,8 @@ public class AIVisualTestingHelper {
     private static final String VISUAL_CHECKPOINTS_DIR = "target/visual-checkpoints";
     
     /**
-     * Initialize visual testing before scenarios
-     * Can be extended with Applitools Eyes or other AI visual testing tools
+     * Initialize visual checkpoint tracking before scenarios
+     * Can be extended with third-party visual testing services
      */
     public static void initializeVisualTesting(Page page, String scenarioName) {
         try {
@@ -44,10 +38,10 @@ public class AIVisualTestingHelper {
                 checkpointDir.mkdirs();
             }
             
-            TestLogger.info("Visual AI testing initialized for: " + scenarioName);
+            TestLogger.info("Visual checkpoint tracking initialized for: " + scenarioName);
             
-            // Placeholder for Applitools Eyes integration:
-            // Eyes eyes = new Eyes();
+            // Placeholder for visual service integration:
+            // VisualService service = new VisualService();
             // eyes.open(page, "OrangeHRM", scenarioName);
             
         } catch (Exception e) {
@@ -57,7 +51,7 @@ public class AIVisualTestingHelper {
     
     /**
      * Capture visual checkpoint during test execution
-     * AI compares this with baseline screenshot
+     * Compare with baseline screenshot for regression detection
      */
     public static void checkVisualAppearance(Page page, String checkpointName) {
         if (!visualTestingEnabled) return;
@@ -66,8 +60,8 @@ public class AIVisualTestingHelper {
             captureCheckpoint(page, checkpointName);
             TestLogger.debug("Visual checkpoint captured: " + checkpointName);
             
-            // Placeholder for Applitools Eyes:
-            // eyes.checkWindow(checkpointName);
+            // Placeholder for visual service integration:
+            // visualService.checkWindow(checkpointName);
             
         } catch (Exception e) {
             TestLogger.warn("Failed to capture visual checkpoint: " + checkpointName, e);
@@ -84,8 +78,8 @@ public class AIVisualTestingHelper {
             captureCheckpoint(page, testName + "_full_page");
             TestLogger.debug("Full page visual checkpoint: " + testName);
             
-            // Placeholder for Applitools Eyes:
-            // eyes.checkWindow(testName + " - Full Page");
+            // Placeholder for visual service integration:
+            // visualService.checkWindow(testName + " - Full Page");
             
         } catch (Exception e) {
             TestLogger.warn("Failed to check full page", e);
@@ -119,10 +113,10 @@ public class AIVisualTestingHelper {
      */
     public static void closeVisualTesting() {
         try {
-            TestLogger.success("Visual testing completed");
+            TestLogger.success("Visual checkpoint tracking completed");
             
-            // Placeholder for Applitools Eyes:
-            // TestResults results = eyes.close();
+            // Placeholder for visual service integration:
+            // TestResults results = visualService.close();
             // if (results.getIsPassed()) {
             //     TestLogger.success("Visual test PASSED");
             // } else {
