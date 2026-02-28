@@ -90,29 +90,32 @@ public class Hooks {
                 browser = playwright.chromium()
                     .launch(new BrowserType.LaunchOptions()
                         .setChannel("chrome")
-                        .setHeadless(headless)
-                        .setArgs(java.util.Arrays.asList("--start-maximized")));
+                        .setHeadless(headless));
             } else if ("chromium".equals(browserName)) {
                 browser = playwright.chromium()
                     .launch(new BrowserType.LaunchOptions()
-                        .setHeadless(headless)
-                        .setArgs(java.util.Arrays.asList("--start-maximized")));
+                        .setHeadless(headless));
             } else if ("firefox".equals(browserName)) {
                 browser = playwright.firefox()
                     .launch(new BrowserType.LaunchOptions()
-                        .setHeadless(headless)
-                        .setArgs(java.util.Arrays.asList("-width=1920", "-height=1080")));
+                        .setHeadless(headless));
             } else if ("webkit".equals(browserName)) {
                 browser = playwright.webkit()
                     .launch(new BrowserType.LaunchOptions().setHeadless(headless));
             } else {
                 browser = playwright.chromium()
                     .launch(new BrowserType.LaunchOptions()
-                        .setHeadless(headless)
-                        .setArgs(java.util.Arrays.asList("--start-maximized")));
+                        .setHeadless(headless));
             }
-            // Create page without viewport size to allow browser to use native maximized size
+            // Create page with a reasonable viewport size
             page = browser.newPage();
+            // Set viewport size after page creation for better compatibility
+            try {
+                page.setViewportSize(1920, 1080);
+            } catch (Exception e) {
+                TestLogger.warn("Could not set viewport size: " + e.getMessage());
+                // Continue anyway, viewport is not critical for functionality
+            }
             testContext = new TestContext(page);
             
             // Initialize helper utilities
@@ -139,21 +142,16 @@ public class Hooks {
     }
 
     private void navigateWithRetry(String appUrl, int navigationTimeout) {
-        // Try primary navigation - trust Playwright's COMMIT state means DOM is ready
+        // Simple navigation - let Playwright handle timing
         try {
             TestLogger.info("Navigating to: " + appUrl);
 
             long startTime = System.currentTimeMillis();
-            page.navigate(
-                appUrl,
-                new Page.NavigateOptions()
-                    .setTimeout((double) navigationTimeout)
-                    .setWaitUntil(WaitUntilState.COMMIT)
-            );
+            page.navigate(appUrl);
             long navigationTime = System.currentTimeMillis() - startTime;
-            TestLogger.info("Page navigation committed in " + navigationTime + "ms");
+            TestLogger.info("Page navigation completed in " + navigationTime + "ms");
 
-            TestLogger.info("Navigation successful, login page should be ready");
+            TestLogger.info("Navigation successful, login page ready for interaction");
             return;
         } catch (Exception e) {
             TestLogger.warn("Navigation failed: " + e.getMessage());

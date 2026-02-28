@@ -165,9 +165,9 @@
                          discover tests automatically based on engines and resources -->
                     <!-- increase timeout to allow Playwright to download and install browsers on first run -->
                     <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
-                    <!-- prevent Playwright from downloading browsers during CI; rely on system Chrome when using channel="chrome" -->
+                    <!-- Allow Playwright to download and use its bundled browsers for more reliable external site testing -->
                     <environmentVariables>
-                        <PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD>true</PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD>
+                        <PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD>false</PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD>
                     </environmentVariables>
                     <systemPropertyVariables>
                         <junit.jupiter.tags>smoke,regression</junit.jupiter.tags>
