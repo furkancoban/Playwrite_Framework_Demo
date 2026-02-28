@@ -11,7 +11,6 @@ import com.example.orangehrm.utils.TestLogger;
 import com.example.orangehrm.utils.ScreenshotHelper;
 import com.example.orangehrm.utils.VisualCheckpointHelper;
 import com.example.orangehrm.utils.ElementLocatorHelper;
-import com.example.orangehrm.utils.SimpleReportTracker;
 import com.example.orangehrm.utils.EnhancedReportGenerator;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -54,24 +53,14 @@ public class Hooks {
             TestLogger.info("Scenarios Executed: " + scenariosExecuted);
             TestLogger.info("Scenarios Passed: " + scenariosPassed);
             TestLogger.info("Scenarios Failed: " + scenariosFailed);
-            TestLogger.info("\nGenerating reports from captured data...");
-            
-            // Ensure final reports are generated
-            SimpleReportTracker.generateHtmlReport();
+            TestLogger.info("\nGenerating enhanced report...");
             
             // Generate enhanced report with beautiful UI
             EnhancedReportGenerator.setTestEndTime(java.time.LocalDateTime.now());
             EnhancedReportGenerator.generateEnhancedReport();
             
-            // Try generating from Cucumber JSON if available
-            com.example.orangehrm.utils.ReportGenerator.generatePartialReport();
-            
-            TestLogger.info("\n📊 AVAILABLE REPORTS:");
-            TestLogger.info("  ✨ Enhanced Report: target/enhanced-test-report.html (RECOMMENDED!)");
-            TestLogger.info("  ✅ Live Report: target/test-execution-report.html");
-            TestLogger.info("  📄 Report Data: target/test-execution-data.txt");
-            TestLogger.info("  📋 Cucumber JSON: target/cucumber.json (if available)");
-            TestLogger.info("  📈 Partial Report: target/cucumber-report-partial.html (if JSON available)");
+            TestLogger.info("\n📊 REPORTS GENERATED:");
+            TestLogger.info("  ✨ Enhanced Report: target/enhanced-test-report.html");
             TestLogger.info("==============================\n");
         }));
     }
