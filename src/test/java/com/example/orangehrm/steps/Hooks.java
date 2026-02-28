@@ -135,19 +135,12 @@ public class Hooks {
             var contextOptions = new Browser.NewContextOptions()
                 .setExtraHTTPHeaders(headers)
                 .setLocale("en-US")
-                .setTimezoneId("America/Chicago");
+                .setTimezoneId("America/Chicago")
+                .setViewportSize(1920, 1080);  // Set large viewport for maximized effect
             
             var context = browser.newContext(contextOptions);
             page = context.newPage();
-            // Maximize window if not headless (Chrome --start-maximized flag handles most of it)
-            if (!headless) {
-                try {
-                    page.evaluate("window.moveTo(0, 0); window.resizeTo(screen.width, screen.height);");
-                    TestLogger.info("Browser window maximized");
-                } catch (Exception e) {
-                    TestLogger.debug("Could not maximize window: " + e.getMessage());
-                }
-            }
+            TestLogger.info("Browser window set to maximized resolution (1920x1080)");
             testContext = new TestContext(page);
             
             // Initialize helper utilities
