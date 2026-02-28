@@ -115,17 +115,26 @@ public class Hooks {
                     .launch(new BrowserType.LaunchOptions()
                         .setHeadless(headless));
             }
-            // Create page with standard browser context (includes user-agent)
-            page = browser.newPage();
-            // Set explicit user-agent for better site compatibility
-            try {
-                page.setExtraHTTPHeaders(java.util.Collections.singletonMap(
-                    "User-Agent", 
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-                ));
-            } catch (Exception e) {
-                TestLogger.warn("Could not set headers: " + e.getMessage());
-            }
+            
+            // Create browser context with proper headers to bypass anti-bot detection
+            java.util.Map<String, String> headers = new java.util.HashMap<>();
+            headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36");
+            headers.put("Accept-Language", "en-US,en;q=0.9");
+            headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+            headers.put("Accept-Encoding", "gzip, deflate, br");
+            headers.put("DNT", "1");
+            headers.put("Sec-Fetch-Dest", "document");
+            headers.put("Sec-Fetch-Mode", "navigate");
+            headers.put("Sec-Fetch-Site", "none");
+            headers.put("Cache-Control", "max-age=0");
+            
+            var contextOptions = new Browser.NewContextOptions()
+                .setExtraHTTPHeaders(headers)
+                .setLocale("en-US")
+                .setTimezoneId("America/Chicago");
+            
+            var context = browser.newContext(contextOptions);
+            page = context.newPage();
             // Set viewport size after page creation for better compatibility
             try {
                 page.setViewportSize(1920, 1080);
@@ -159,7 +168,7 @@ public class Hooks {
     }
 
     private void navigateWithRetry(String appUrl, int navigationTimeout) {
-        // Navigate with COMMIT state - waits for DOMContentLoaded which is sufficient for most SPAs
+        // Navigate with optimized settings - LOAD waits for page load event (fast for SPAs)
         try {
             TestLogger.info("Navigating to: " + appUrl);
 
@@ -167,8 +176,8 @@ public class Hooks {
             page.navigate(
                 appUrl,
                 new Page.NavigateOptions()
-                    .setTimeout(30000.0)  // 30 second timeout for external site
-                    .setWaitUntil(WaitUntilState.COMMIT)
+                    .setTimeout(15000.0)  // 15 second timeout - much faster than 30s
+                    .setWaitUntil(WaitUntilState.LOAD)  // Wait for load event (optimal for this site)
             );
             long navigationTime = System.currentTimeMillis() - startTime;
             TestLogger.info("Page navigation completed in " + navigationTime + "ms");
