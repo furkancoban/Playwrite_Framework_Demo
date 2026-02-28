@@ -310,6 +310,9 @@ public class EnhancedReportGenerator {
                "        .scenario-meta { font-size: 13px; color: #64748b; }\n" +
                "        .scenario-body { padding: 20px; background: white; display: none; }\n" +
                "        .scenario-body.active { display: block; }\n" +
+               "        .scenario-failure-reason { background: #fee2e2; border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px; margin-bottom: 20px; color: #991b1b; font-weight: 600; }\n" +
+               "        .scenario-failure-reason i { color: #991b1b; margin-right: 10px; font-size: 18px; }\n" +
+               "        .failure-text { margin-top: 10px; font-family: 'Courier New', monospace; font-size: 12px; color: #7f1d1d; white-space: pre-wrap; word-break: break-word; background: white; padding: 10px; border-radius: 4px; }\n" +
                "        .step-list { list-style: none; }\n" +
                "        .step-item { display: flex; gap: 15px; padding: 12px; border-radius: 8px; margin-bottom: 8px; transition: background 0.2s; }\n" +
                "        .step-item:hover { background: #f8fafc; }\n" +
@@ -322,7 +325,9 @@ public class EnhancedReportGenerator {
                "        .step-keyword { font-weight: 600; color: #667eea; }\n" +
                "        .step-duration { font-size: 12px; color: #94a3b8; }\n" +
                "        .error-message { background: #fee2e2; border-left: 4px solid #ef4444; padding: 15px; border-radius: 8px; margin-top: 10px; font-family: 'Courier New', monospace; font-size: 13px; color: #991b1b; white-space: pre-wrap; }\n" +
+               "        .error-message i { margin-right: 8px; }\n" +
                "        .step-screenshot { margin-top: 12px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; }\n" +
+               "        .failed-step-screenshot { border: 2px solid #ef4444; background: #fee2e2; }\n" +
                "        .screenshot-img { max-width: 100%; height: auto; border-radius: 8px; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }\n" +
                "        .footer { text-align: center; padding: 30px; color: white; font-size: 14px; }\n" +
                "        .badge { display: inline-block; padding: 5px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }\n" +
@@ -521,6 +526,15 @@ public class EnhancedReportGenerator {
             details.append("                    <i class=\"fas fa-chevron-down\" id=\"icon-").append(scenarioIndex).append("\"></i>\n");
             details.append("                </div>\n");
             details.append("                <div class=\"scenario-body\" id=\"scenario-").append(scenarioIndex).append("\">\n");
+            
+            // Show scenario-level failure reason if failed
+            if ("FAILED".equals(scenario.status) && scenario.errorMessage != null && !scenario.errorMessage.isEmpty()) {
+                details.append("                    <div class=\"scenario-failure-reason\">\n");
+                details.append("                        <i class=\"fas fa-exclamation-circle\"></i> Failure Reason\n");
+                details.append("                        <div class=\"failure-text\">").append(escapeHtml(scenario.errorMessage)).append("</div>\n");
+                details.append("                    </div>\n");
+            }
+            
             details.append("                    <ul class=\"step-list\">\n");
             
             for (TestStep step : scenario.steps) {
@@ -535,12 +549,12 @@ public class EnhancedReportGenerator {
                 details.append("                                <div class=\"step-duration\">").append(stepDuration).append("</div>\n");
                 
                 if (step.errorMessage != null && !step.errorMessage.isEmpty()) {
-                    details.append("                                <div class=\"error-message\">").append(escapeHtml(step.errorMessage)).append("</div>\n");
+                    details.append("                                <div class=\"error-message\"><i class=\"fas fa-exclamation-triangle\"></i> ").append(escapeHtml(step.errorMessage)).append("</div>\n");
                 }
                 
-                // Display screenshot if available
+                // Display screenshot if available (especially important for failed steps)
                 if (step.screenshotBase64 != null && !step.screenshotBase64.isEmpty()) {
-                    details.append("                                <div class=\"step-screenshot\">\n");
+                    details.append("                                <div class=\"step-screenshot").append("failed".equals(stepStatusClass) ? " failed-step-screenshot" : "").append("\">\n");
                     details.append("                                    <img src=\"data:image/png;base64,").append(step.screenshotBase64).append("\" alt=\"Step Screenshot\" class=\"screenshot-img\">\n");
                     details.append("                                </div>\n");
                 }
