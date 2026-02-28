@@ -11,10 +11,8 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <!-- Cucumber engine requires a fairly recent JUnit Platform; the class
-             DiscoveryIssueReporter is available starting around platform 1.14.
-             Use a matching Jupiter release (5.14.2) so the correct engine version
-             is pulled in automatically. -->
+        <!-- Need JUnit Platform 1.14+ for Cucumber to work properly.
+             Using Jupiter 5.14.2 so Maven pulls in the right versions. -->
         <junit.jupiter.version>5.14.2</junit.jupiter.version>
         <playwright.version>1.40.0</playwright.version>
         <cucumber.version>7.34.2</cucumber.version>

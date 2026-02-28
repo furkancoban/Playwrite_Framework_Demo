@@ -7,12 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manages runtime state for test execution. This class holds references to page objects
- * and test-specific data that needs to be shared across different step definitions.
+ * Keeps track of stuff during test execution. Holds our page objects and any data
+ * that needs to be shared between different steps.
  * 
- * Note: Using a context object instead of static fields makes tests much cleaner
- * and prevents state leakage between scenarios. Learned this the hard way with
- * parallelization issues.
+ * Note: Using a context object instead of static fields is way cleaner and prevents
+ * weird state issues between scenarios. Learned that lesson the hard way!
  */
 public class TestContext {
 
@@ -27,8 +26,7 @@ public class TestContext {
         this.dashboardPage = new DashboardPage(page);
     }
 
-    // Accessor methods for page objects
-    // Each page object is lazy-initialized with the current page instance
+    // Get page objects - each one is created once with the current page
     public Page getPage() {
         return page;
     }
@@ -41,8 +39,8 @@ public class TestContext {
         return dashboardPage;
     }
 
-    // Store test-specific runtime data that needs to be accessible across multiple steps
-    // This helps reduce coupling between step definitions
+    // Store test data that needs to be shared across multiple steps.
+    // Helps keep step definitions loosely coupled.
     public void setTestData(String key, Object value) {
         testData.put(key, value);
     }
@@ -66,17 +64,17 @@ public class TestContext {
         return value != null ? Boolean.parseBoolean(value.toString()) : false;
     }
 
-    // Clears all stored test data. Useful for cleanup between test runs.
+    // Clear all test data. Good for cleanup between runs.
     public void clearTestData() {
         testData.clear();
     }
 
-    // Check if data exists before retrieval to avoid NPE
+    // Check if we have a specific piece of data
     public boolean hasTestData(String key) {
         return testData.containsKey(key);
     }
 
-    // Debug helper - useful during test development/debugging
+    // Debug helper - prints everything we've stored
     public void printTestData() {
         testData.forEach((key, value) -> 
             System.out.println("TestData - " + key + ": " + value)

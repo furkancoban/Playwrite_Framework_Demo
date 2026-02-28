@@ -1,10 +1,10 @@
 @regression
 Feature: Comprehensive regression tests for OrangeHRM
 
-  These scenarios exercise a wider variety of OrangeHRM modules, navigation,
-  and workflows to catch potential regressions after updates or deployments.
-  This suite includes all non-smoke tests (40+ scenarios) to ensure comprehensive
-  coverage of functionality beyond the critical 10-test smoke suite.
+  This is the full regression suite - everything that didn't make it into the
+  smoke tests. We've got 40+ scenarios here covering all the different modules,
+  workflows, and edge cases. Run this when you want thorough coverage before
+  a release or after major changes.
 
   Scenario Outline: Navigate to different modules
     Given I am on the OrangeHRM login page
@@ -25,7 +25,7 @@ Feature: Comprehensive regression tests for OrangeHRM
       | Dashboard   | dashboard   |
 
   @regression @login_workflow
-  Scenario: Complete login and logout workflow
+  Scenario: Full login and logout cycle
     Given I am on the OrangeHRM login page
     When I login with valid credentials
     Then I should see the dashboard
@@ -34,7 +34,7 @@ Feature: Comprehensive regression tests for OrangeHRM
     Then I should be on the login page
 
   @regression @navigation
-  Scenario: Verify all main menu items are accessible
+  Scenario: Check all menu items are clickable
     Given I am on the OrangeHRM login page
     When I login with valid credentials
     Then I should see the dashboard

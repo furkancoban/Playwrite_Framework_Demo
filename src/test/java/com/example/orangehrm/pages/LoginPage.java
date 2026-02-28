@@ -5,7 +5,7 @@ import com.example.orangehrm.config.ConfigManager;
 import com.microsoft.playwright.Page;
 
 /**
- * LoginPage - Page Object for OrangeHRM Login Page
+ * Page object for the OrangeHRM login page. Has all the selectors and actions for logging in.
  */
 public class LoginPage extends BasePage {
 
@@ -20,7 +20,7 @@ public class LoginPage extends BasePage {
     }
 
     /**
-     * Verify login page is loaded
+     * Make sure the login page actually loaded
      */
     public LoginPage verifyLoginPageIsLoaded() {
         try {
@@ -34,7 +34,7 @@ public class LoginPage extends BasePage {
     }
 
     /**
-     * Enter username
+     * Type in the username
      */
     public LoginPage enterUsername(String username) {
         TestLogger.testStep("Enter username: " + username);
@@ -43,7 +43,7 @@ public class LoginPage extends BasePage {
     }
 
     /**
-     * Enter password
+     * Type in the password
      */
     public LoginPage enterPassword(String password) {
         TestLogger.testStep("Enter password");
@@ -52,7 +52,7 @@ public class LoginPage extends BasePage {
     }
 
     /**
-     * Click login button
+     * Click the login button and return the dashboard page
      */
     public DashboardPage clickLoginButton() {
         TestLogger.testStep("Click login button");
@@ -62,7 +62,7 @@ public class LoginPage extends BasePage {
     }
 
     /**
-     * Perform complete login with credentials from config
+     * Do the whole login flow using credentials from the config file
      */
     public DashboardPage loginWithValidCredentials() {
         TestLogger.testStep("Login with valid credentials");
@@ -75,7 +75,7 @@ public class LoginPage extends BasePage {
     }
 
     /**
-     * Perform login with custom credentials
+     * Login with specific credentials (not from config)
      */
     public DashboardPage loginWithCredentials(String username, String password) {
         TestLogger.testStep("Login with custom credentials");

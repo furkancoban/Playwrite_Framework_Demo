@@ -4,16 +4,16 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Global configuration handler. Loads properties from test.properties on startup.
+ * Handles all our configuration stuff. Loads properties from test.properties when the class loads.
  * 
- * This approach works well because:
- * - Single point to update test configuration
- * - Easy to override via system properties for CI/CD
- * - Supports environment-specific configs if needed
- * - No need to mess with multiple config files
+ * Why this approach:
+ * - One place to change test settings
+ * - Easy to override with system properties for CI/CD
+ * - Can support different environments if we need it
+ * - No messing with a bunch of config files
  * 
- * Initially tried using YAML but Properties format is more standard for Java projects
- * and easier to manage in CI/CD environments like Jenkins and GitHub Actions.
+ * I initially tried YAML but Properties is more standard for Java projects
+ * and way easier to work with in CI/CD tools like Jenkins or GitHub Actions.
  */
 public class ConfigManager {
 
@@ -25,7 +25,7 @@ public class ConfigManager {
     }
 
     /**
-     * Load properties from configuration file
+     * Load properties from our config file
      */
     private static void loadProperties() {
         try (InputStream input = ConfigManager.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
@@ -40,8 +40,8 @@ public class ConfigManager {
     }
 
     /**
-     * Get property value with sensible defaults.
-     * Using Optional pattern would be nicer but Properties.get() null-safe is cleaner for our use case.
+     * Get a property value with a default fallback.
+     * Could use Optional here but this is cleaner for our needs.
      */
     public static String getProperty(String key, String defaultValue) {
         return properties.getProperty(key, defaultValue);
@@ -55,7 +55,7 @@ public class ConfigManager {
     }
 
     /**
-     * Retrieve property as integer. Safer than casting to avoid ClassCastException.\n     * Defaults to fallback value if parsing fails.
+     * Get property as an integer. Returns the default if parsing fails.
      */
     public static int getPropertyAsInt(String key, int defaultValue) {
         String value = properties.getProperty(key);

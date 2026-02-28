@@ -6,7 +6,13 @@ import com.example.orangehrm.utils.VisualCheckpointHelper;
 import com.example.orangehrm.config.ConfigManager;
 import com.microsoft.playwright.Page;
 
-/**\n * Encapsulates common page object patterns used across all page classes.\n * This reduces duplication and makes maintenance easier when we need to tweak\n * retry logic, timeouts, or error handling in one place.\n * \n * Note: Initially had too many custom retry mechanisms here, but found that\n * Playwright's built-in waits are solid. Removed that complexity.\n */
+/**
+ * Base class for all page objects. Has the common stuff we use everywhere.
+ * This way we don't repeat the same code in every page class.
+ * 
+ * Note: I tried adding a bunch of custom retry logic at first, but Playwright's
+ * built-in waits are actually pretty solid. Kept it simple.
+ */
 @SuppressWarnings("unused")
 public class BasePage {
 
@@ -18,8 +24,7 @@ public class BasePage {
     }
 
     /**
-     * Click an element with proper wait and error handling.
-     * Uses optimized timeout configuration for better performance.
+     * Click an element. Waits for it to show up first.
      */
     @SuppressWarnings("unused")
     public void clickElement(String selector) {
@@ -34,7 +39,7 @@ public class BasePage {
     }
 
     /**
-     * Safe element fill with error handling
+     * Fill in a field. Waits for it, then types the value.
      */
     @SuppressWarnings("unused")
     public void fillField(String selector, String value) {
@@ -49,7 +54,7 @@ public class BasePage {
     }
 
     /**
-     * Safe element visibility check
+     * Check if an element is visible
      */
     public boolean isElementVisible(String selector) {
         try {
@@ -61,7 +66,7 @@ public class BasePage {
     }
 
     /**
-     * Safe element existence check
+     * Check if an element exists on the page
      */
     public boolean isElementPresent(String selector) {
         try {

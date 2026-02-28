@@ -12,14 +12,14 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 /**
- * BDD step definitions for OrangeHRM tests.
+ * Step definitions that connect our Cucumber scenarios to actual code.
  * 
- * Each method maps to a Gherkin step in the feature files.
- * We use PicoContainer dependency injection (via cucumber-picocontainer) to get
- * TestContext injected, which gives us access to page objects.
+ * Each method here maps to a line in the feature files (the "Given", "When", "Then" steps).
+ * We use Cucumber's dependency injection to get the TestContext, which gives us
+ * access to all our page objects.
  * 
- * The assertions are basic but comprehensive enough - each step validates
- * that its primary action succeeded. More complicated validation logic lives in page objects.
+ * The assertions are pretty straightforward - each step just checks that its main
+ * action worked. More complex validation lives in the page objects themselves.
  */
 public class StepDefinitions {
 
@@ -36,8 +36,8 @@ public class StepDefinitions {
     }
     
     /**
-     * Helper method to perform assertion and capture screenshot
-     * Screenshot is embedded in the Cucumber report with PASS/FAIL status
+     * Helper to do an assertion and grab a screenshot.
+     * Screenshots get embedded in the Cucumber report with PASS/FAIL status.
      */
     @SuppressWarnings("unused")
     private void assertTrueWithScreenshot(boolean condition, String message, String stepDescription) {
@@ -57,7 +57,7 @@ public class StepDefinitions {
     }
     
     /**
-     * Helper method for assertNotNull with screenshot
+     * Helper for assertNotNull with a screenshot
      */
     @SuppressWarnings("unused")
     private void assertNotNullWithScreenshot(Object object, String message, String stepDescription) {

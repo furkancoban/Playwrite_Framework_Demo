@@ -5,7 +5,7 @@ import com.example.orangehrm.utils.TestLogger;
 import com.microsoft.playwright.Page;
 
 /**
- * DashboardPage - Page Object for OrangeHRM Dashboard
+ * Page object for the main dashboard. Has methods for navigation and user menu stuff.
  */
 public class DashboardPage extends BasePage {
 
@@ -20,7 +20,7 @@ public class DashboardPage extends BasePage {
     }
 
     /**
-     * Verify dashboard is loaded
+     * Make sure we're actually on the dashboard
      */
     public DashboardPage verifyDashboardIsLoaded() {
         int dashboardTimeout = Math.max(ConfigManager.getPageLoadTimeout(), 15000);
@@ -48,7 +48,7 @@ public class DashboardPage extends BasePage {
     }
 
     /**
-     * Navigate to a menu item
+     * Click on a menu item to go to that module
      */
     public DashboardPage navigateToMenu(String menuName) {
         TestLogger.testStep("Navigate to menu: " + menuName);
@@ -69,7 +69,7 @@ public class DashboardPage extends BasePage {
     }
 
     /**
-     * Click user profile dropdown
+     * Click the user profile icon in the top right
      */
     public DashboardPage clickUserProfileDropdown() {
         TestLogger.testStep("Click user profile dropdown");
@@ -79,7 +79,7 @@ public class DashboardPage extends BasePage {
     }
 
     /**
-     * Logout from application
+     * Log out and go back to the login page
      */
     public LoginPage logout() {
         TestLogger.testStep("Logout from application");
@@ -91,7 +91,7 @@ public class DashboardPage extends BasePage {
     }
 
     /**
-     * Get count of main menu items
+     * Count how many menu items are in the sidebar
      */
     public int getMainMenuItemsCount() {
         int menuTimeout = Math.max(ConfigManager.getElementWaitTimeout(), 8000);

@@ -18,16 +18,15 @@ import io.cucumber.java.Scenario;
 import java.util.Properties;
 
 /**
- * Cucumber hooks for test lifecycle management.
+ * Cucumber hooks for managing the test lifecycle.
  * 
- * @Before: Runs before each scenario - initializes browser and navigates to app
- * @After: Runs after each scenario - cleans up resources
- * @AfterStep: Allows adding delays between steps for observation (useful for debugging)
+ * @Before - Runs before each test scenario, sets up the browser and goes to the app
+ * @After - Runs after each scenario, cleans up resources and grabs screenshots if things failed
+ * @AfterStep - Lets you add delays between steps if you want to watch what's happening
  * 
- * Static fields here are injected into StepDefinitions. While static state can be
- * problematic for parallel execution, it works fine for sequential test runs
- * and keeps the code simple. If parallelization is needed later, could switch to
- * ThreadLocal or Scenario context.
+ * Note: We're using static fields here for simplicity. Yeah, it's not great for parallel
+ * execution, but for running tests one at a time it works fine and keeps the code simple.
+ * If we ever need parallel runs, we can switch to ThreadLocal or Cucumber's Scenario context.
  */
 public class Hooks {
 
@@ -81,9 +80,9 @@ public class Hooks {
         TestLogger.info("Starting test scenario... browser=" + browserName + " headless=" + headless);
         
         try {
-            // Initialize Playwright browser. Using channel="chrome" because it's more stable
-            // than launching from scratch - assumes Chrome is installed on the system.
-            // For CI/CD, ensure chromium is installed via container or runner setup.
+            // Initialize Playwright browser. We're using channel="chrome" because it's more stable
+            // than letting Playwright download its own version. Just make sure Chrome is installed.
+            // For CI/CD, you'll want to ensure Chrome is available in your container or runner.
             
             playwright = Playwright.create();
             if ("chrome".equals(browserName)) {
@@ -116,7 +115,8 @@ public class Hooks {
                         .setHeadless(headless));
             }
             
-            // Create browser context with proper headers to bypass anti-bot detection
+            // Create browser context with real browser headers to avoid anti-bot detection.
+            // OrangeHRM's demo site can be picky about automated requests.
             java.util.Map<String, String> headers = new java.util.HashMap<>();
             headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36");
             headers.put("Accept-Language", "en-US,en;q=0.9");
@@ -135,12 +135,12 @@ public class Hooks {
             
             var context = browser.newContext(contextOptions);
             page = context.newPage();
-            // Set viewport size after page creation for better compatibility
+            // Set viewport size after page creation - works better this way
             try {
                 page.setViewportSize(1920, 1080);
             } catch (Exception e) {
                 TestLogger.warn("Could not set viewport size: " + e.getMessage());
-                // Continue anyway, viewport is not critical for functionality
+                // Not a big deal, continue anyway
             }
             testContext = new TestContext(page);
             
@@ -149,8 +149,8 @@ public class Hooks {
             ElementLocatorHelper.initializeSelfHealing(page);
             
             String appUrl = ConfigManager.getAppUrl();
-            // Use configured timeout with a safe minimum for external site variability
-            int navigationTimeout = Math.max(ConfigManager.getPageLoadTimeout(), MIN_NAVIGATION_TIMEOUT_MS);
+            // Use our configured timeout, but never less than 30 seconds.
+            // External sites can be slow, especially demo environments.
 
             page.setDefaultTimeout(navigationTimeout);
             page.setDefaultNavigationTimeout(navigationTimeout);
@@ -168,7 +168,8 @@ public class Hooks {
     }
 
     private void navigateWithRetry(String appUrl, int navigationTimeout) {
-        // Navigate with stable settings - LOAD event ensures page is ready
+        // Navigate to the app. We wait for the LOAD event which means the page is ready.
+        // The external demo site can take a while, so we give it 30 seconds.
         try {
             TestLogger.info("Navigating to: " + appUrl);
 
