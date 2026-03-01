@@ -420,9 +420,11 @@ public class StepDefinitions {
     public void i_should_see_personal_details_section() {
         TestLogger.testStep("Verify personal details section on My Info page");
         assertNotNull(testContext.getPage(), "Page should exist");
-        // Page loaded successfully if we can access it
+        // Ensure page is fully loaded before checking for the Personal Details section
         testContext.getPage().waitForLoadState();
-        TestLogger.assertion("Personal details section is visible on My Info page");
+        boolean personalDetailsVisible = testContext.getPage().isVisible("text=Personal Details");
+        assertTrue(personalDetailsVisible, "Personal Details section should be visible on My Info page");
+        TestLogger.assertion("[OK] Personal Details section is visible on My Info page");
     }
 
     @When("I verify all main menu items are present")
