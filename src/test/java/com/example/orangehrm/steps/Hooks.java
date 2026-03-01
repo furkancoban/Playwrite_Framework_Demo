@@ -210,15 +210,26 @@ public class Hooks {
 
     @io.cucumber.java.AfterStep
     public void afterStep(Scenario scenario) {
-        // Capture screenshot after each step and embed in report
+        // Capture screenshot after EVERY step and embed in report
         if (page != null && scenario != null) {
             try {
+                // Get current step info
+                String stepName = scenario.getSourceTagNames().isEmpty() ? 
+                    "Step Screenshot" : 
+                    "Screenshot for step";
+                
                 byte[] screenshot = page.screenshot();
-                scenario.attach(screenshot, "image/png", "Step Screenshot");
-                TestLogger.debug("Screenshot captured and embedded after step");
+                if (screenshot != null && screenshot.length > 0) {
+                    scenario.attach(screenshot, "image/png", stepName);
+                    TestLogger.debug("✓ Screenshot captured and embedded (" + screenshot.length + " bytes)");
+                } else {
+                    TestLogger.warn("Screenshot captured but empty");
+                }
             } catch (Exception e) {
-                TestLogger.error("Failed to capture step screenshot", e);
+                TestLogger.error("Failed to capture step screenshot: " + e.getMessage());
             }
+        } else {
+            TestLogger.debug("Cannot capture screenshot - page or scenario is null");
         }
         
         // Add step delay if configured (for observation during manual test runs)

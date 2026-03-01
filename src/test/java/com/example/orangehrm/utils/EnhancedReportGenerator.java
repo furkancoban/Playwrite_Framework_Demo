@@ -179,7 +179,14 @@ public class EnhancedReportGenerator {
                                 JsonNode embeddings = step.get("embeddings");
                                 if (embeddings != null && embeddings.isArray() && embeddings.size() > 0) {
                                     for (JsonNode embedding : embeddings) {
-                                        if (embedding.has("mime_type") && embedding.get("mime_type").asText().contains("image")) {
+                                        String mimeType = "";
+                                        if (embedding.has("mime_type")) {
+                                            mimeType = embedding.get("mime_type").asText();
+                                        } else if (embedding.has("mediaType")) {
+                                            mimeType = embedding.get("mediaType").asText();
+                                        }
+                                        
+                                        if (mimeType.contains("image")) {
                                             if (embedding.has("data")) {
                                                 testStep.screenshotBase64 = embedding.get("data").asText();
                                                 testStep.screenshotPath = "screenshot_" + scenario.steps.size();
