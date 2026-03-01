@@ -37,7 +37,7 @@ public class Hooks {
     public static Properties testProperties;
     public static Scenario currentScenario;
 
-    private static final int MIN_NAVIGATION_TIMEOUT_MS = 30000;  // 30 seconds minimum for stable initial load
+    private static final int MIN_NAVIGATION_TIMEOUT_MS = 60000;  // 60 seconds for reliable navigation on slow demo sites
     @SuppressWarnings("unused")
 	private static final int NAVIGATION_RETRY_COUNT = 2;  // Reduce retries for faster failure
     private static volatile int scenariosExecuted = 0;
@@ -148,14 +148,13 @@ public class Hooks {
             ElementLocatorHelper.initializeSelfHealing(page);
             
             String appUrl = ConfigManager.getAppUrl();
-            // Use our configured timeout, but never less than 30 seconds.
-            // External sites can be slow, especially demo environments.
-            int navigationTimeout = MIN_NAVIGATION_TIMEOUT_MS;
+            // Use 60 second timeout for reliable navigation
+            int navigationTimeout = 60000;
 
             page.setDefaultTimeout(navigationTimeout);
             page.setDefaultNavigationTimeout(navigationTimeout);
 
-            navigateWithRetry(appUrl, navigationTimeout);
+            navigateWithRetry(appUrl);
             TestLogger.success("Browser launched and navigated to: " + appUrl);
         } catch (Exception e) {
             TestLogger.error("Playwright initialization failed", e);
@@ -167,28 +166,45 @@ public class Hooks {
         }
     }
 
-    private void navigateWithRetry(String appUrl, int navigationTimeout) {
-        // Navigate to the app. We wait for the LOAD event which means the page is ready.
-        // The external demo site can take a while, so we give it 30 seconds.
-        try {
-            TestLogger.info("Navigating to: " + appUrl);
+    private void navigateWithRetry(String appUrl) {
+        // Navigate to the app. We wait for domcontentloaded which means the HTML is parsed
+        // and the page is interactive. "load" event waits for all resources (images, etc)
+        // and can timeout on slow demo sites. Try 2 times with exponential backoff.
+        int maxRetries = 2;
+        long initialDelay = 2000;  // 2 seconds
+        
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                TestLogger.info("Navigation attempt " + attempt + " to: " + appUrl);
 
-            long startTime = System.currentTimeMillis();
-            page.navigate(
-                appUrl,
-                new Page.NavigateOptions()
-                    .setTimeout(30000.0)  // 30 second timeout for external demo site
-                    .setWaitUntil(WaitUntilState.LOAD)  // Wait for complete page load
-            );
-            
-            long navigationTime = System.currentTimeMillis() - startTime;
-            TestLogger.info("Page navigation completed in " + navigationTime + "ms");
+                long startTime = System.currentTimeMillis();
+                page.navigate(
+                    appUrl,
+                    new Page.NavigateOptions()
+                        .setTimeout(60000.0)  // 60 second timeout for slow demo sites
+                        .setWaitUntil(WaitUntilState.DOMCONTENTLOADED)  // Wait for HTML parsing, not all images/css
+                );
+                
+                long navigationTime = System.currentTimeMillis() - startTime;
+                TestLogger.info("✓ Page navigation completed in " + navigationTime + "ms");
 
-            TestLogger.info("Navigation successful, login page ready for interaction");
-            return;
-        } catch (Exception e) {
-            TestLogger.warn("Navigation failed: " + e.getMessage());
-            throw new RuntimeException("Cannot load login page: " + appUrl, e);
+                TestLogger.info("Navigation successful, login page ready for interaction");
+                return;  // Success!
+            } catch (Exception e) {
+                if (attempt < maxRetries) {
+                    long backoffDelay = initialDelay * attempt;  // Exponential backoff: 2s, 4s
+                    TestLogger.warn("Navigation attempt " + attempt + " failed: " + e.getMessage());
+                    TestLogger.info("Waiting " + backoffDelay + "ms before retry...");
+                    try {
+                        Thread.sleep(backoffDelay);
+                    } catch (InterruptedException ignored) {
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    TestLogger.error("All navigation retries exhausted");
+                    throw new RuntimeException("Cannot load login page after " + maxRetries + " attempts: " + appUrl, e);
+                }
+            }
         }
     }
 
