@@ -324,6 +324,7 @@ Feature: Comprehensive regression tests for OrangeHRM
         When I navigate to "Dashboard" menu
         Then the URL should contain "dashboard"
         And I should see the main menu
+        And I should see at least 8 menu items
         When I click on my profile
         Then I should see user menu options
         And I should see the logout option
