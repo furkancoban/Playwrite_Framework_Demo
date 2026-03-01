@@ -66,6 +66,7 @@ public class LoginPage extends BasePage {
      */
     public DashboardPage loginWithValidCredentials() {
         TestLogger.testStep("Login with valid credentials");
+        // Pull credentials from centralized config so local/CI environments stay consistent.
         String username = ConfigManager.getUsername();
         String password = ConfigManager.getPassword();
         
@@ -79,6 +80,7 @@ public class LoginPage extends BasePage {
      */
     public DashboardPage loginWithCredentials(String username, String password) {
         TestLogger.testStep("Login with custom credentials");
+        // Useful for negative tests or data-driven credential scenarios.
         return enterUsername(username)
                 .enterPassword(password)
                 .clickLoginButton();

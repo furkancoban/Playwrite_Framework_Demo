@@ -18,6 +18,7 @@ public class UIAssertions {
     }
     
     public UIAssertions withContext(String context) {
+        // Context string is appended to log/error messages for easier triage.
         this.currentContext = " [" + context + "]";
         return this;
     }
@@ -29,6 +30,7 @@ public class UIAssertions {
     
     public UIAssertions elementIsVisible(String selector, int timeoutMs) {
         try {
+            // Wait for visibility instead of immediate check to reduce flaky timing failures.
             Locator element = page.locator(selector);
             element.waitFor(new Locator.WaitForOptions().setTimeout(timeoutMs));
             String msg = "✓ Element is visible: " + selector + currentContext;
@@ -84,6 +86,7 @@ public class UIAssertions {
     // URL assertions
     public UIAssertions urlContains(String expectedUrlPart) {
         try {
+            // URL checks are useful after navigation actions where DOM may still be stable.
             String currentUrl = page.url();
             if (currentUrl.contains(expectedUrlPart)) {
                 String msg = "✓ URL contains '" + expectedUrlPart + "'";

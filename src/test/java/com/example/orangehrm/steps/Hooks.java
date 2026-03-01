@@ -37,7 +37,8 @@ public class Hooks {
     public static Properties testProperties;
     public static Scenario currentScenario;
 
-    private static final int MIN_NAVIGATION_TIMEOUT_MS = 60000;  // 60 seconds for reliable navigation on slow demo sites
+    @SuppressWarnings("unused")
+	private static final int MIN_NAVIGATION_TIMEOUT_MS = 60000;  // 60 seconds for reliable navigation on slow demo sites
     @SuppressWarnings("unused")
 	private static final int NAVIGATION_RETRY_COUNT = 2;  // Reduce retries for faster failure
     private static volatile int scenariosExecuted = 0;
@@ -67,6 +68,7 @@ public class Hooks {
 
     @Before
     public void beforeScenario(Scenario scenario) {
+        // Capture scenario reference early so utilities can attach screenshots/metadata.
         currentScenario = scenario;
         scenarioStartTime.set(java.time.LocalDateTime.now()); // Track start time
         String browserName = ConfigManager.getBrowser();
@@ -138,6 +140,7 @@ public class Hooks {
                 .setTimezoneId("America/Chicago")
                 .setViewportSize(1920, 1080);  // Set large viewport for maximized effect
             
+            // Context-level options are shared for all tabs/pages in this scenario.
             var context = browser.newContext(contextOptions);
             page = context.newPage();
             TestLogger.info("Browser window set to maximized resolution (1920x1080)");
@@ -191,6 +194,7 @@ public class Hooks {
                 TestLogger.info("Navigation successful, login page ready for interaction");
                 return;  // Success!
             } catch (Exception e) {
+                // Retry once with backoff to handle intermittent network/demo-site slowness.
                 if (attempt < maxRetries) {
                     long backoffDelay = initialDelay * attempt;  // Exponential backoff: 2s, 4s
                     TestLogger.warn("Navigation attempt " + attempt + " failed: " + e.getMessage());
@@ -253,7 +257,7 @@ public class Hooks {
         long durationMs = startTime != null ? 
             java.time.Duration.between(startTime, endTime).toMillis() : 0;
         
-        // Track execution statistics for partial report generation
+        // Track counters used by shutdown hook summary and enhanced report metadata.
         scenariosExecuted++;
         String status;
         if (scenario.isFailed()) {

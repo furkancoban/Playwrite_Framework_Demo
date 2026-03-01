@@ -29,6 +29,7 @@ public class BasePage {
     @SuppressWarnings("unused")
     public void clickElement(String selector) {
         try {
+            // Explicit wait prevents click attempts on detached/not-yet-rendered elements.
             page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(DEFAULT_TIMEOUT));
             page.click(selector);
             TestLogger.success("Clicked element: " + selector);
@@ -44,6 +45,7 @@ public class BasePage {
     @SuppressWarnings("unused")
     public void fillField(String selector, String value) {
         try {
+            // Wait then fill keeps typing reliable on dynamic forms.
             page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(DEFAULT_TIMEOUT));
             page.fill(selector, value);
             TestLogger.success("Filled field: " + selector + " with value: " + value);
@@ -58,6 +60,7 @@ public class BasePage {
      */
     public boolean isElementVisible(String selector) {
         try {
+            // Fast check; returns false instead of throwing to keep assertions readable upstream.
             return page.locator(selector).isVisible();
         } catch (Exception e) {
             TestLogger.debug("Element not visible: " + selector);
@@ -95,6 +98,7 @@ public class BasePage {
      * Wait for page load state
      */
     public void waitForPageLoad() {
+        // Uses Playwright default load-state semantics for broad compatibility.
         page.waitForLoadState();
         TestLogger.info("Page loaded");
     }

@@ -88,10 +88,12 @@ public class ConfigManager {
     }
 
     public static String getBrowser() {
+        // System property takes precedence so CI can switch browser without file edits.
         return System.getProperty("test.browser", "chrome");
     }
 
     public static boolean isHeadless() {
+        // Defaults to headed mode locally for easier debugging.
         return Boolean.parseBoolean(System.getProperty("test.headless", "false"));
     }
 
@@ -104,6 +106,7 @@ public class ConfigManager {
     }
 
     public static long getStepDelay() {
+        // Optional slowdown to make step-by-step execution observable.
         return Long.parseLong(System.getProperty("test.step.delay", "0"));
     }
 }

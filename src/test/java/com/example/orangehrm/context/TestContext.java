@@ -21,6 +21,7 @@ public class TestContext {
     private Map<String, Object> testData = new HashMap<>();
 
     public TestContext(Page page) {
+        // All page objects share the same underlying Playwright Page instance.
         this.page = page;
         this.loginPage = new LoginPage(page);
         this.dashboardPage = new DashboardPage(page);
@@ -50,12 +51,14 @@ public class TestContext {
     }
 
     public String getTestDataAsString(String key) {
+        // Safe conversion helper to avoid repeated casting in step definitions.
         Object value = testData.get(key);
         return value != null ? value.toString() : null;
     }
 
     public int getTestDataAsInt(String key) {
         Object value = testData.get(key);
+        // Returns 0 when absent to keep assertions explicit in the calling step.
         return value != null ? Integer.parseInt(value.toString()) : 0;
     }
 

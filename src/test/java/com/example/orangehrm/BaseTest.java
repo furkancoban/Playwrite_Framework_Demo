@@ -15,18 +15,20 @@ public class BaseTest {
 
     @BeforeEach
     public void setUp() {
+        // Create a fresh browser stack for each test method to avoid state leakage.
         playwright = Playwright.create();
         browser = playwright.chromium()
                 .launch(new BrowserType.LaunchOptions()
                     .setHeadless(true)
                     .setArgs(java.util.Arrays.asList("--start-maximized")));
         page = browser.newPage();
-        // Navigate directly to login page using config URL
+        // Start each test from the login page for deterministic test setup.
         page.navigate(ConfigManager.getAppUrl());
     }
 
     @AfterEach
     public void tearDown() {
+        // Close browser first (child resource), then Playwright engine.
         if (browser != null) {
             browser.close();
         }

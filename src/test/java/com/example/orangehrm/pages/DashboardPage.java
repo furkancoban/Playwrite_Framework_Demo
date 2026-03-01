@@ -23,6 +23,7 @@ public class DashboardPage extends BasePage {
      * Make sure we're actually on the dashboard
      */
     public DashboardPage verifyDashboardIsLoaded() {
+        // Keep timeout configurable but never below a practical baseline.
         int dashboardTimeout = Math.max(ConfigManager.getPageLoadTimeout(), 15000);
 
         for (int attempt = 1; attempt <= 2; attempt++) {
@@ -37,6 +38,7 @@ public class DashboardPage extends BasePage {
             } catch (Exception e) {
                 TestLogger.error("Dashboard load attempt " + attempt + " failed", e);
                 if (attempt < 2) {
+                    // Brief pause before retry to absorb transition/render lag.
                     wait(1000);
                 } else {
                     throw new RuntimeException("Dashboard did not load", e);
@@ -94,6 +96,7 @@ public class DashboardPage extends BasePage {
      * Count how many menu items are in the sidebar
      */
     public int getMainMenuItemsCount() {
+        // Similar strategy: configurable timeout with safe minimum.
         int menuTimeout = Math.max(ConfigManager.getElementWaitTimeout(), 8000);
 
         for (int attempt = 1; attempt <= 2; attempt++) {
@@ -106,6 +109,7 @@ public class DashboardPage extends BasePage {
                     return count;
                 }
 
+                // Allow one short retry when shell loads before menu entries render.
                 wait(500);
             } catch (Exception e) {
                 TestLogger.error("Menu count attempt " + attempt + " failed", e);
