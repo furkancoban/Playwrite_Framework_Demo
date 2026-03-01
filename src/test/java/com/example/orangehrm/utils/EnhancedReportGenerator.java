@@ -111,7 +111,7 @@ public class EnhancedReportGenerator {
                 writer.print(htmlContent);
             }
             
-            TestLogger.success("✨ Enhanced HTML report generated: " + ENHANCED_REPORT_PATH);
+            TestLogger.success("[SUCCESS] Enhanced HTML report generated: " + ENHANCED_REPORT_PATH);
             
         } catch (Exception e) {
             TestLogger.error("Failed to generate enhanced report", e);
@@ -383,11 +383,11 @@ public class EnhancedReportGenerator {
      * Generate report header section
      */
     private static String generateReportHeader(int total, int passed, int failed, double passRate, Duration totalDuration) {
-        String statusEmoji = passRate == 100 ? "✅" : passRate >= 80 ? "⚠️" : "❌";
+        String statusEmoji = passRate == 100 ? "[PASS]" : passRate >= 80 ? "[WARN]" : "[FAIL]";
         String statusText = passRate == 100 ? "All Tests Passed" : passRate >= 80 ? "Mostly Passed" : "Tests Failed";
         
         return "        <div class=\"header\">\n" +
-               "            <h1><span class=\"icon\">🎭</span> Playwright ORANGE HRM Test Execution Report</h1>\n" +
+               "            <h1><span class=\"icon\">[TEST]</span> Playwright ORANGE HRM Test Execution Report</h1>\n" +
                "            <p style=\"font-size: 18px; color: #64748b; margin-top: 10px;\">" + statusEmoji + " " + statusText + " - " + passed + "/" + total + " scenarios passed</p>\n" +
                "            <div class=\"header-meta\">\n" +
                "                <div class=\"header-meta-item\"><i class=\"fas fa-calendar\"></i> <span>" + testStartTime.format(DATE_FORMATTER) + "</span></div>\n" +
@@ -547,7 +547,7 @@ public class EnhancedReportGenerator {
         int scenarioIndex = 0;
         for (TestScenario scenario : testScenarios) {
             String statusClass = "PASSED".equals(scenario.status) ? "passed" : "failed";
-            String statusIcon = "PASSED".equals(scenario.status) ? "✓" : "✗";
+            String statusIcon = "PASSED".equals(scenario.status) ? "[OK]" : "[NO]";
             String durationStr = String.format("%.2fs", scenario.durationMs / 1000.0);
             
             details.append("            <div class=\"scenario-card\">\n");
@@ -575,7 +575,7 @@ public class EnhancedReportGenerator {
             
             for (TestStep step : scenario.steps) {
                 String stepStatusClass = step.status != null ? step.status.toLowerCase() : "unknown";
-                String stepIcon = "passed".equals(stepStatusClass) ? "✓" : "failed".equals(stepStatusClass) ? "✗" : "○";
+                String stepIcon = "passed".equals(stepStatusClass) ? "[OK]" : "failed".equals(stepStatusClass) ? "[NO]" : "[~]";
                 String stepDuration = String.format("%.0fms", (double) step.durationMs);
                 
                 details.append("                        <li class=\"step-item\">\n");
@@ -674,10 +674,10 @@ public class EnhancedReportGenerator {
         System.out.println("Manually regenerating enhanced test report...");
         try {
             generateEnhancedReport();
-            System.out.println("✓ Report regenerated successfully!");
+            System.out.println("[OK] Report regenerated successfully!");
             System.out.println("Open target/enhanced-test-report.html to view");
         } catch (Exception e) {
-            System.err.println("✗ Failed to regenerate report: " + e.getMessage());
+            System.err.println("[FAIL] Failed to regenerate report: " + e.getMessage());
             e.printStackTrace();
         }
     }

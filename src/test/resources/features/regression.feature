@@ -324,13 +324,13 @@ Feature: Comprehensive regression tests for OrangeHRM
         When I navigate to "Dashboard" menu
         Then the URL should contain "dashboard"
         And I should see the main menu
+        And I should see at least 8 menu items
         When I click on my profile
         Then I should see user menu options
         And I should see the logout option
         When I logout
         Then I should be on the login page
         And the login page should display properly
-    And I should see at least 8 menu items
-    Then the page title should contain "OrangeHRM"
+        And the page title should contain "OrangeHRM"
 
 

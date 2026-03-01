@@ -28,12 +28,13 @@ This is a clean, well-organized test automation framework for OrangeHRM. It uses
 ✅ **Cross-browser Support** - Run tests on Chrome, Firefox, or Safari  
 ✅ **Detailed Reporting** - HTML reports with screenshots for every step  
 ✅ **Smart Logging** - Comprehensive logs for debugging  
-✅ **Parallel Execution Ready** - Framework supports parallel test runs  
-✅ **CI/CD Ready** - Easy integration with Jenkins, GitHub Actions, etc.  
+✅ **Parallel Execution** - Tests run 4x faster with CircleCI parallelization  
+✅ **CI/CD Active** - CircleCI integrated with automated test runs on every push  
+✅ **Pre-push Hooks** - Optional local enforcement to catch failures before pushing  
 ✅ **Auto Cleanup** - Generated reports and logs cleaned automatically  
 
 **Test Coverage:**
-- 10 smoke tests - Critical functionality checks (runs in ~5 minutes)
+- 21 smoke tests - Critical functionality checks (runs in ~5 minutes)
 - 40+ regression tests - Comprehensive coverage of all features
 
 ## Prerequisites
@@ -87,7 +88,7 @@ orangehrm-playwright-tests/
 │   │       └── TestLogger.java             # Custom logging utility
 │   └── resources/
 │       ├── features/
-│       │   ├── smoke.feature               # 10 critical smoke tests
+│       │   ├── smoke.feature               # 21 critical smoke tests
 │       │   └── regression.feature          # 40+ regression tests
 │       ├── test.properties                 # Test configuration
 │       └── log4j2.xml                      # Logging configuration
@@ -106,7 +107,7 @@ orangehrm-playwright-tests/
 ### Run Test Suites
 
 ```bash
-# Smoke tests - Quick validation (10 tests, ~5 minutes)
+# Smoke tests - Quick validation (21 tests, ~5 minutes)
 mvn "-Dcucumber.filter.tags=@smoke" test
 
 # Regression tests - Full suite (40+ tests, ~30 minutes)
@@ -151,42 +152,63 @@ mvn clean test
 
 ## CI/CD with CircleCI
 
-This repository includes CircleCI config at [.circleci/config.yml](.circleci/config.yml).
+✅ **CircleCI is connected and running!** 
 
-### What it does
+This repository is integrated with CircleCI for continuous testing. Configuration: [.circleci/config.yml](.circleci/config.yml)
 
-- Triggers on every push/commit to the repository
-- Runs tests in **parallel (4 shards)** for faster feedback
-- Uses Maven cache to speed up dependency resolution
-- Runs browser tests in `headless` mode on CI
+### What CircleCI Does
 
-### Enforce "no failing code in repo"
+- **Automatic Triggers** - Runs tests on every push/PR to the repository
+- **Parallel Execution** - Runs tests across **4 parallel nodes** for 4x faster feedback
+  - Node 0: Tests tagged @test1-@test5
+  - Node 1: Tests tagged @test6-@test10
+  - Node 2: Tests tagged @test11-@test15
+  - Node 3: Tests tagged @test16-@test21
+- **Smart Caching** - Caches Maven dependencies to speed up builds
+- **Headless Execution** - Runs browser tests in headless Chromium mode
+- **Fast Feedback** - Full smoke suite completes in ~2 minutes with parallelization
 
-To make sure failed tests block repository updates, enable **branch protection** on GitHub:
+### Pipeline Status
 
-1. GitHub → `Settings` → `Branches` → `Add rule`
-2. Branch pattern: `main`
-3. Enable:
-   - `Require a pull request before merging`
-   - `Require status checks to pass before merging`
-4. Select the CircleCI check for this workflow/job
-5. (Optional) Enable `Require branches to be up to date before merging`
+View live pipeline status and test results: [CircleCI Dashboard](https://app.circleci.com/pipelines/github/furkancoban/Playwright_Framework_Demo)
 
-This prevents merging to `main` when CircleCI tests fail.
+### Enforce Quality Gates (Branch Protection)
 
-### Optional local gate before push
+**Recommended:** Enable branch protection to automatically block failing code from entering `main`:
 
-A local pre-push hook is included at [.githooks/pre-push](.githooks/pre-push).
+1. Go to: **GitHub** → **Settings** → **Branches** → **Branch protection rules**
+2. Click **Add rule** or edit existing `main` rule
+3. Branch name pattern: `main`
+4. Enable these settings:
+   - ✅ **Require status checks to pass before merging**
+   - Search for and select the CircleCI check (appears after first pipeline run)
+   - ✅ **Require branches to be up to date before merging** (optional but recommended)
+   - ✅ **Require a pull request before merging** (optional - adds review requirement)
+5. Click **Create** or **Save changes**
 
-Enable it once per clone:
+Once enabled, no code with failing tests can be merged to `main`.
+
+### Local Pre-Push Hook (Optional)
+
+✅ **Already configured in this workspace!**
+
+A local pre-push hook is available at [.githooks/pre-push](.githooks/pre-push) and has been activated.
+
+**What it does:** Runs smoke tests before every `git push` and blocks the push if tests fail.
+
+**To enable on other machines** (when cloning the repo):
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-After enabling, every `git push` runs smoke tests first and blocks the push on failure.
+**To bypass the hook** (for urgent pushes):
 
-(Committing locally can’t be centrally blocked by CI; branch protection blocks merge/push to protected branches.)
+```bash
+git push --no-verify
+```
+
+**Note:** This is a local safety net. Branch protection on GitHub provides centralized enforcement that cannot be bypassed.
 
 ## Configuration
 
