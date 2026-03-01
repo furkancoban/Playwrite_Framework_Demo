@@ -33,10 +33,10 @@ public class UIAssertions {
             // Wait for visibility instead of immediate check to reduce flaky timing failures.
             Locator element = page.locator(selector);
             element.waitFor(new Locator.WaitForOptions().setTimeout(timeoutMs));
-            String msg = "✓ Element is visible: " + selector + currentContext;
+            String msg = "[OK] Element is visible: " + selector + currentContext;
             TestLogger.success(msg);
         } catch (Exception e) {
-            String msg = "✗ Element NOT visible: " + selector + currentContext;
+            String msg = "[FAIL] Element NOT visible: " + selector + currentContext;
             TestLogger.error(msg);
             throw new AssertionError(msg, e);
         }
@@ -49,15 +49,15 @@ public class UIAssertions {
             Locator element = page.locator(selector);
             String actualText = element.textContent();
             if (actualText != null && actualText.contains(expectedText)) {
-                String msg = "✓ Element contains text '" + expectedText + "': " + selector + currentContext;
+                String msg = "[OK] Element contains text \"" + expectedText + "\": " + selector + currentContext;
                 TestLogger.success(msg);
             } else {
-                String msg = "✗ Element text mismatch. Expected: '" + expectedText + "', Got: '" + actualText + "'" + currentContext;
+                String msg = "[FAIL] Element text mismatch. Expected: \"" + expectedText + "\", Got: \"" + actualText + "\"" + currentContext;
                 TestLogger.error(msg);
                 throw new AssertionError(msg);
             }
         } catch (Exception e) {
-            String msg = "✗ Failed to verify element text: " + selector + currentContext;
+            String msg = "[FAIL] Failed to verify element text: " + selector + currentContext;
             TestLogger.error(msg);
             throw new AssertionError(msg, e);
         }
@@ -68,15 +68,15 @@ public class UIAssertions {
         try {
             String bodyText = page.locator("body").textContent();
             if (bodyText!= null && bodyText.contains(expectedText)) {
-                String msg = "✓ Page contains text '" + expectedText + "'" + currentContext;
+                String msg = "[OK] Page contains text '" + expectedText + "'" + currentContext;
                 TestLogger.success(msg);
             } else {
-                String msg = "✗ Page text not found: '" + expectedText + "'" + currentContext;
+                String msg = "[FAIL] Page text not found: '" + expectedText + "'" + currentContext;
                 TestLogger.error(msg);
                 throw new AssertionError(msg);
             }
         } catch (Exception e) {
-            String msg = "✗ Failed to verify page text" + currentContext;
+            String msg = "[FAIL] Failed to verify page text" + currentContext;
             TestLogger.error(msg);
             throw new AssertionError(msg, e);
         }
@@ -89,15 +89,15 @@ public class UIAssertions {
             // URL checks are useful after navigation actions where DOM may still be stable.
             String currentUrl = page.url();
             if (currentUrl.contains(expectedUrlPart)) {
-                String msg = "✓ URL contains '" + expectedUrlPart + "'";
+                String msg = "[OK] URL contains '" + expectedUrlPart + "'";
                 TestLogger.success(msg);
             } else {
-                String msg = "✗ URL does not contain '" + expectedUrlPart + "'. Current URL: " + currentUrl;
+                String msg = "[FAIL] URL does not contain '" + expectedUrlPart + "'. Current URL: " + currentUrl;
                 TestLogger.error(msg);
                 throw new AssertionError(msg);
             }
         } catch (Exception e) {
-            String msg = "✗ Failed to verify URL" + currentContext;
+            String msg = "[FAIL] Failed to verify URL" + currentContext;
             TestLogger.error(msg);
             throw new AssertionError(msg, e);
         }
@@ -108,15 +108,15 @@ public class UIAssertions {
         try {
             String currentUrl = page.url();
             if (currentUrl.equals(expectedUrl)) {
-                String msg = "✓ URL matches: " + expectedUrl;
+                String msg = "[OK] URL matches: " + expectedUrl;
                 TestLogger.success(msg);
             } else {
-                String msg = "✗ URL mismatch. Expected: '" + expectedUrl + "', Got: '" + currentUrl + "'";
+                String msg = "[FAIL] URL mismatch. Expected: '" + expectedUrl + "', Got: '" + currentUrl + "'";
                 TestLogger.error(msg);
                 throw new AssertionError(msg);
             }
         } catch (Exception e) {
-            String msg = "✗ Failed to verify URL" + currentContext;
+            String msg = "[FAIL] Failed to verify URL" + currentContext;
             TestLogger.error(msg);
             throw new AssertionError(msg, e);
         }
@@ -128,15 +128,15 @@ public class UIAssertions {
         try {
             int actualCount = page.locator(selector).count();
             if (actualCount == expectedCount) {
-                String msg = "✓ Element count matches: " + expectedCount + " for selector: " + selector + currentContext;
+                String msg = "[OK] Element count matches: " + expectedCount + " for selector: " + selector + currentContext;
                 TestLogger.success(msg);
             } else {
-                String msg = "✗ Element count mismatch. Expected: " + expectedCount + ", Got: " + actualCount + " for selector: " + selector + currentContext;
+                String msg = "[FAIL] Element count mismatch. Expected: " + expectedCount + ", Got: " + actualCount + " for selector: " + selector + currentContext;
                 TestLogger.error(msg);
                 throw new AssertionError(msg);
             }
         } catch (Exception e) {
-            String msg = "✗ Failed to verify element count: " + selector + currentContext;
+            String msg = "[FAIL] Failed to verify element count: " + selector + currentContext;
             TestLogger.error(msg);
             throw new AssertionError(msg, e);
         }
@@ -147,15 +147,15 @@ public class UIAssertions {
         try {
             int actualCount = page.locator(selector).count();
             if (actualCount > minCount) {
-                String msg = "✓ Element count (" + actualCount + ") is greater than " + minCount + " for selector: " + selector + currentContext;
+                String msg = "[OK] Element count (" + actualCount + ") is greater than " + minCount + " for selector: " + selector + currentContext;
                 TestLogger.success(msg);
             } else {
-                String msg = "✗ Element count (" + actualCount + ") is NOT greater than " + minCount + " for selector: " + selector + currentContext;
+                String msg = "[FAIL] Element count (" + actualCount + ") is NOT greater than " + minCount + " for selector: " + selector + currentContext;
                 TestLogger.error(msg);
                 throw new AssertionError(msg);
             }
         } catch (Exception e) {
-            String msg = "✗ Failed to verify element count: " + selector + currentContext;
+            String msg = "[FAIL] Failed to verify element count: " + selector + currentContext;
             TestLogger.error(msg);
             throw new AssertionError(msg, e);
         }
@@ -167,15 +167,15 @@ public class UIAssertions {
         try {
             String actualValue = page.locator(selector).getAttribute(attributeName);
             if (actualValue != null && actualValue.equals(expectedValue)) {
-                String msg = "✓ Element attribute " + attributeName + " = '" + expectedValue + "' for selector: " + selector + currentContext;
+                String msg = "[OK] Element attribute " + attributeName + " = '" + expectedValue + "' for selector: " + selector + currentContext;
                 TestLogger.success(msg);
             } else {
-                String msg = "✗ Attribute mismatch. Expected: '" + expectedValue + "', Got: '" + actualValue + "' for " + attributeName + " on: " + selector + currentContext;
+                String msg = "[FAIL] Attribute mismatch. Expected: '" + expectedValue + "', Got: '" + actualValue + "' for " + attributeName + " on: " + selector + currentContext;
                 TestLogger.error(msg);
                 throw new AssertionError(msg);
             }
         } catch (Exception e) {
-            String msg = "✗ Failed to verify element attribute: " + selector + currentContext;
+            String msg = "[FAIL] Failed to verify element attribute: " + selector + currentContext;
             TestLogger.error(msg);
             throw new AssertionError(msg, e);
         }
@@ -187,15 +187,15 @@ public class UIAssertions {
         try {
             String actualTitle = page.title();
             if (actualTitle.contains(expectedTitle)) {
-                String msg = "✓ Page title contains '" + expectedTitle + "'";
+                String msg = "[OK] Page title contains '" + expectedTitle + "'";
                 TestLogger.success(msg);
             } else {
-                String msg = "✗ Title mismatch. Expected to contain: '" + expectedTitle + "', Got: '" + actualTitle + "'";
+                String msg = "[FAIL] Title mismatch. Expected to contain: '" + expectedTitle + "', Got: '" + actualTitle + "'";
                 TestLogger.error(msg);
                 throw new AssertionError(msg);
             }
         } catch (Exception e) {
-            String msg = "✗ Failed to verify page title";
+            String msg = "[FAIL] Failed to verify page title";
             TestLogger.error(msg);
             throw new AssertionError(msg, e);
         }
