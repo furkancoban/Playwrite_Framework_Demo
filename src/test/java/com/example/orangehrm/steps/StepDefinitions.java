@@ -40,7 +40,7 @@ public class StepDefinitions {
      * Get UIAssertions instance for professional assertions
      */
     private UIAssertions assertions() {
-        return new UIAssertions(testContext.getPage()).withContext(testContext.getScenarioName());
+        return new UIAssertions(testContext.getPage()).withContext("Step Assertion");
     }
     
     /**

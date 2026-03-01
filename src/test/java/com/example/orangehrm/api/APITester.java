@@ -20,7 +20,8 @@ public class APITester {
     private HttpClient httpClient;
     private String baseUrl;
     private Map<String, String> defaultHeaders;
-    private ObjectMapper objectMapper;
+    @SuppressWarnings("unused")
+	private ObjectMapper objectMapper;
     
     public APITester(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -78,12 +79,13 @@ public class APITester {
     public APIResponse post(String endpoint, String body) {
         try {
             String url = baseUrl + endpoint;
-            HttpRequest request = HttpRequest.newBuilder()
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
-                .uri(new URI(url))
-                .apply(b -> defaultHeaders.forEach(b::header))
-                .build();
+                .uri(new URI(url));
             
+            defaultHeaders.forEach(requestBuilder::header);
+            
+            HttpRequest request = requestBuilder.build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             TestLogger.info("✓ POST " + endpoint + " : " + response.statusCode());
             return new APIResponse(response);
@@ -99,12 +101,13 @@ public class APITester {
     public APIResponse put(String endpoint, String body) {
         try {
             String url = baseUrl + endpoint;
-            HttpRequest request = HttpRequest.newBuilder()
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
-                .uri(new URI(url))
-                .apply(b -> defaultHeaders.forEach(b::header))
-                .build();
+                .uri(new URI(url));
             
+            defaultHeaders.forEach(requestBuilder::header);
+            
+            HttpRequest request = requestBuilder.build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             TestLogger.info("✓ PUT " + endpoint + " : " + response.statusCode());
             return new APIResponse(response);
@@ -120,12 +123,13 @@ public class APITester {
     public APIResponse delete(String endpoint) {
         try {
             String url = baseUrl + endpoint;
-            HttpRequest request = HttpRequest.newBuilder()
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .DELETE()
-                .uri(new URI(url))
-                .apply(b -> defaultHeaders.forEach(b::header))
-                .build();
+                .uri(new URI(url));
             
+            defaultHeaders.forEach(requestBuilder::header);
+            
+            HttpRequest request = requestBuilder.build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             TestLogger.info("✓ DELETE " + endpoint + " : " + response.statusCode());
             return new APIResponse(response);
@@ -150,7 +154,8 @@ public class APITester {
     public static class APIResponse {
         private int statusCode;
         private String body;
-        private HttpResponse<String> rawResponse;
+        @SuppressWarnings("unused")
+		private HttpResponse<String> rawResponse;
         
         public APIResponse(HttpResponse<String> response) {
             this.rawResponse = response;
@@ -190,7 +195,8 @@ public class APITester {
             return this;
         }
         
-        public APIResponse assertJsonField(String fieldName, String expectedValue) {
+        @SuppressWarnings("unchecked")
+		public APIResponse assertJsonField(String fieldName, String expectedValue) {
             try {
                 ObjectMapper mapper = new ObjectMapper();
                 Map<String, Object> json = mapper.readValue(body, Map.class);
