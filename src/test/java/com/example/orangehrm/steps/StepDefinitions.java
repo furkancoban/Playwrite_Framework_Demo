@@ -7,6 +7,7 @@ import com.example.orangehrm.pages.DashboardPage;
 import com.example.orangehrm.context.TestContext;
 import com.example.orangehrm.utils.TestLogger;
 import com.example.orangehrm.utils.ScreenshotHelper;
+import com.example.orangehrm.assertions.UIAssertions;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -33,6 +34,13 @@ public class StepDefinitions {
             this.loginPage = testContext.getLoginPage();
             this.dashboardPage = testContext.getDashboardPage();
         }
+    }
+    
+    /**
+     * Get UIAssertions instance for professional assertions
+     */
+    private UIAssertions assertions() {
+        return new UIAssertions(testContext.getPage()).withContext(testContext.getScenarioName());
     }
     
     /**
@@ -119,11 +127,8 @@ public class StepDefinitions {
     @Then("the page title should contain {string}")
     public void the_page_title_should_contain(String text) {
         TestLogger.testStep("Verify page title contains: " + text);
-        assertNotNull(testContext.getPage(), "Browser page should exist");
-        String pageTitle = testContext.getPage().title();
-        assertTrue(pageTitle.toLowerCase().contains(text.toLowerCase()),
-                "Page title '" + pageTitle + "' should contain '" + text + "'");
-        TestLogger.assertion("Page title verified: " + pageTitle);
+        // Use professional UI assertion
+        assertions().titleContains(text);
     }
 
     @Then("I should see the {string} page header")
@@ -180,17 +185,8 @@ public class StepDefinitions {
     @Then("the URL should contain {string}")
     public void the_url_should_contain(String urlPart) {
         TestLogger.testStep("Verify URL contains: " + urlPart);
-        assertNotNull(testContext.getPage(), "Browser page should exist");
-        String currentUrl = testContext.getPage().url();
-
-        boolean matchesExpectedUrl = currentUrl.contains(urlPart);
-        if (!matchesExpectedUrl && "myinfo".equalsIgnoreCase(urlPart)) {
-            matchesExpectedUrl = currentUrl.contains("viewPersonalDetails") || currentUrl.contains("empNumber");
-        }
-
-        assertTrue(matchesExpectedUrl,
-                "URL '" + currentUrl + "' should contain '" + urlPart + "' (or equivalent routed path)");
-        TestLogger.assertion("URL verification passed: " + currentUrl);
+        // Use professional UI assertion for URL validation
+        assertions().urlContains(urlPart);
     }
 
     @When("I wait for {int} seconds")
@@ -247,90 +243,22 @@ public class StepDefinitions {
     @Then("I should see the username field")
     public void i_should_see_username_field() {
         TestLogger.testStep("Verify username field is visible");
-        assertNotNull(loginPage, "Login page should exist");
-        
-        // After failed login, form might need time to reset - try multiple times with small waits
-        boolean fieldVisible = false;
-        for (int attempt = 1; attempt <= 3; attempt++) {
-            if (loginPage.isElementVisible("input[name='username']")) {
-                fieldVisible = true;
-                break;
-            }
-            if (attempt < 3) {
-                TestLogger.debug("Field not visible yet (attempt " + attempt + "/3), waiting before retry...");
-                loginPage.wait(500); // Wait 500ms before retry
-            }
-        }
-        
-        // If field still not visible after retries, accept URL-based confirmation
-        if (!fieldVisible) {
-            String currentUrl = testContext.getPage().url();
-            if (currentUrl.contains("auth/login") || currentUrl.contains("login")) {
-                TestLogger.assertion("Username field not immediately visible, but page is on login URL: " + currentUrl);
-                return; // Accept this state
-            }
-        }
-        
-        assertTrue(fieldVisible, "Username field should be visible");
-        TestLogger.assertion("Username field is visible");
+        // Use professional UI assertion
+        assertions().elementIsVisible("input[name='username']");
     }
 
     @Then("I should see the password field")
     public void i_should_see_password_field() {
         TestLogger.testStep("Verify password field is visible");
-        assertNotNull(loginPage, "Login page should exist");
-        
-        // After failed login, form might need time to reset - try multiple times with small waits
-        boolean fieldVisible = false;
-        for (int attempt = 1; attempt <= 3; attempt++) {
-            if (loginPage.isElementVisible("input[name='password']")) {
-                fieldVisible = true;
-                break;
-            }
-            if (attempt < 3) {
-                TestLogger.debug("Field not visible yet (attempt " + attempt + "/3), waiting before retry...");
-                loginPage.wait(500);
-            }
-        }
-        
-        // If field still not visible after retries, accept URL-based confirmation
-        if (!fieldVisible) {
-            String currentUrl = testContext.getPage().url();
-            if (currentUrl.contains("auth/login") || currentUrl.contains("login")) {
-                TestLogger.assertion("Password field not immediately visible, but page is on login URL: " + currentUrl);
-                return;
-            }
-        }
-        
-        assertTrue(fieldVisible, "Password field should be visible");
-        TestLogger.assertion("Password field is visible");
+        // Use professional UI assertion
+        assertions().elementIsVisible("input[name='password']");
     }
 
     @Then("I should see the login button")
     public void i_should_see_login_button() {
         TestLogger.testStep("Verify login button is visible");
-        assertNotNull(loginPage, "Login page should exist");
-        
-        // Try to wait for button with explicit timeout and retries
-        boolean buttonVisible = false;
-        long startTime = System.currentTimeMillis();
-        long maxWaitMs = 10000;  // Max 10 seconds to wait
-        
-        while (System.currentTimeMillis() - startTime < maxWaitMs) {
-            if (loginPage.isElementVisible("button[type='submit']")) {
-                buttonVisible = true;
-                break;
-            }
-            try {
-                Thread.sleep(500);  // Check every 500ms
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
-        
-        assertTrue(buttonVisible, "Login button should be visible");
-        TestLogger.assertion("Login button is visible");
+        // Use professional UI assertion
+        assertions().elementIsVisible("button[type='submit']");
     }
 
     @When("I verify login page elements are visible")
