@@ -70,7 +70,6 @@ public class StepDefinitions {
     /**
      * Helper for assertNotNull with a screenshot
      */
-    @SuppressWarnings("unused")
     private void assertNotNullWithScreenshot(Object object, String message, String stepDescription) {
         try {
             assertNotNull(object, message);
