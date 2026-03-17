@@ -460,7 +460,7 @@ xdg-open target/enhanced-test-report.html
 | ⚙️ Configuration | ✅ | EnhancedConfigManager |
 | 📊 Reporting | ✅ | EnhancedReportGenerator |
 | 📸 Screenshots | ✅ | ScreenshotHelper, Hooks |
-| 🔍 Visual Testing | ✅ | AIVisualTestingHelper |
+| 🔍 Visual Testing | ✅ | VisualCheckpointHelper |
 | 📝 Logging | ✅ | TestLogger |
 | 🌍 Multi-Browser | ✅ | Hooks (Chrome support, others) |
 | 🔄 Parallel Execution | ✅ | Maven configuration |
