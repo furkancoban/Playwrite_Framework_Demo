@@ -159,7 +159,7 @@ This repository is integrated with CircleCI for continuous testing. Configuratio
 ### What CircleCI Does
 
 - **Automatic Triggers** - Runs tests on every push/PR to the repository
-- **Parallel Execution** - Runs tests across **4 parallel nodes** for 4x faster feedback
+- **Parallel Execution** - Runs tests across **4 parallel nodes**
   - Node 0: Tests tagged @test1-@test5
   - Node 1: Tests tagged @test6-@test10
   - Node 2: Tests tagged @test11-@test15
@@ -172,43 +172,6 @@ This repository is integrated with CircleCI for continuous testing. Configuratio
 
 View live pipeline status and test results: [CircleCI Dashboard](https://app.circleci.com/pipelines/github/furkancoban/Playwright_Framework_Demo)
 
-### Enforce Quality Gates (Branch Protection)
-
-**Recommended:** Enable branch protection to automatically block failing code from entering `main`:
-
-1. Go to: **GitHub** → **Settings** → **Branches** → **Branch protection rules**
-2. Click **Add rule** or edit existing `main` rule
-3. Branch name pattern: `main`
-4. Enable these settings:
-   - ✅ **Require status checks to pass before merging**
-   - Search for and select the CircleCI check (appears after first pipeline run)
-   - ✅ **Require branches to be up to date before merging** (optional but recommended)
-   - ✅ **Require a pull request before merging** (optional - adds review requirement)
-5. Click **Create** or **Save changes**
-
-Once enabled, no code with failing tests can be merged to `main`.
-
-### Local Pre-Push Hook (Optional)
-
-✅ **Already configured in this workspace!**
-
-A local pre-push hook is available at [.githooks/pre-push](.githooks/pre-push) and has been activated.
-
-**What it does:** Runs smoke tests before every `git push` and blocks the push if tests fail.
-
-**To enable on other machines** (when cloning the repo):
-
-```bash
-git config core.hooksPath .githooks
-```
-
-**To bypass the hook** (for urgent pushes):
-
-```bash
-git push --no-verify
-```
-
-**Note:** This is a local safety net. Branch protection on GitHub provides centralized enforcement that cannot be bypassed.
 
 ## Configuration
 
@@ -320,7 +283,6 @@ After each test run, you'll find:
 
 ### 🌟 Enhanced Report Features
 
-The new enhanced report includes:
 - 📊 **Interactive Charts** - Visual analytics with Chart.js
 - 🎨 **Modern UI** - Clean, professional design with gradient cards
 - ⏱️ **Execution Timeline** - See your tests run in sequence
@@ -500,5 +462,3 @@ pipeline {
 - Check the [Playwright Java docs](https://playwright.dev/java/)
 - Review [Cucumber documentation](https://cucumber.io/docs/cucumber/)
 - Look at existing tests in `src/test/resources/features/` for examples
-
-**Happy Testing! 🚀**
